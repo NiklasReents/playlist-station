@@ -12,12 +12,10 @@ import "./App.css";
 
 export default function App() {
   // GLOBAL VARIABLES (DRAFT: may be subject to change!)
-  // toggle image: flip chevron image from right to left or the other way round with each click, which changes the content of the App BODY (mobile: FORM -> PLAYLIST, PLAYLIST -> FORM; desktop: switch out FORM from left to right, PLAYLIST from right to left and inversely)
-  const [swapView, setSwapView] = useState(chevronRight); // -> pass variable and toggle function to HEADER (for display and setting purposes) and variable to BODY (for information purpose) via props
-  // toggle image: toggle between menu button and close button with each click, which opens or closes a small popup menu with three options: register, login, settings; pressing any of those buttons renders the MENU component into the BODY (in place of the FORM)
-  const [expandMenu, setExpandMenu] = useState(menu); // -> pass variable and toggle function to HEADER (for display and setting purposes) via props
-  // set menu form content: render the MENU form within the BODY and set its content depending on which button of the HEADER's popup menu (register, login, settings) was clicked; change the chevron image to an "X" (close) with which the MENU can be closed
-  const [menuContent, setMenuContent] = useState(""); // -> pass this setter function and "setSwapView" to HEADER (for data retrieval/setting purposes) and this variable to BODY -> MENU (for information purpose) via props
+  const [viewButton, setViewButton] = useState(chevronRight); // -> pass variable and "toggleView" function to HEADER (for image display and setting purposes) and variable to BODY as well (for information purpose) via props
+  const [popupImage, setPopupImage] = useState(menu); // -> pass variable and "togglePopupMenu" function to HEADER (for image display and setting purposes) via props
+  const [popupList, setPopupList] = useState(<></>); // -> pass variable to HEADER and setter function to "togglePopupMenu" (in order to show or hide the popup menu list) via props
+  const [menuContent, setMenuContent] = useState(""); // -> pass this setter function and "setViewButton" to "changeMenuContent" function (used by "togglePopupMenu" for data retrieval/setting purposes) and this variable to BODY -> MENU (for information purpose) via props
   // toggle image: toggle between list and shuffle playlist modes with each click
   const [playlistMode, setPlaylistMode] = useState(list); // -> pass variable and toggle function to FOOTER (for display and setting purposes) and variable to BODY -> PLAYLIST (for information purpose) via props
   // set user status: determine whether a user is currently not connected to the server, connected but not logged in, connected and logged in (some actions and status messages depend on the connection and login status)
@@ -25,9 +23,62 @@ export default function App() {
   // set status message: display message in the FOOTER that gets triggered by certain user actions (pressing the send data button of the song FORM, deleting songs etc.); connection-related messages depend on "userStatus" variable (disconnected, not logged in, logged in)
   const [statusMessage, setStatusMessage] = useState(""); // -> pass setter function to various components where certain events happen (e.g. FORM, PLAYLIST) and variable to FOOTER (for information/display purpose) via props ("useReducer" hook as alternative?)
   // set username: get username from server token after logging in (through the MENU login component), display current username in the top section of the HEADER
-  const [username, setUsername] = useState(""); // -> pass setter function to MENU (for data retrieval purpose (from login)) and variable to HEADER (for display purpose) via props; save username in localstorage
+  const [username, setUsername] = useState("User"); // -> pass setter function to MENU (for data retrieval purpose (from login)) and variable to HEADER (for display purpose) via props; save username in localstorage
   // set playlist data: get playlist data from dropdown menu in the HEADER by selecting one of the playlist names, which renders the respective playlist data into SONG components within the PLAYLIST container
   const [playlistData, setPlaylistData] = useState([]); // -> pass setter function to HEADER (for data retrieval purpose (from dropdown menu)) and variable to BODY -> PLAYLIST via props
 
-  return <></>;
+  /* 
+  flip chevron image from right to left or the other way round with each click, which changes the content of the App BODY (via "viewButton" variable passed to it as props)
+  (mobile: FORM -> PLAYLIST, PLAYLIST -> FORM; desktop: switch out FORM from left to right, PLAYLIST from right to left and inversely) 
+  */
+  function toggleView() {
+    if (viewButton === chevronLeft || viewButton === close) {
+      setViewButton(chevronRight);
+    } else {
+      setViewButton(chevronLeft);
+    }
+  }
+
+  /* 
+  toggle between a hidden and visible popup menu with a handler function that changes the content of the MENU component (via "menuContent" variable passed to MENU as props) depending on which button was clicked
+  */
+  function togglePopupMenu() {
+    // NOTE: potentially merge image and list variables into one variable
+    if (popupImage === menu) {
+      setPopupImage(close);
+      setPopupList(
+        <div onClick={(e) => changeMenuContent(e)}>
+          <button>Register</button>
+          <button>Login</button>
+          <button>Settings</button>
+        </div>
+      );
+    } else {
+      // NOTE: close popup menu as well by clicking outside of it
+      setPopupImage(menu);
+      setPopupList(<></>);
+    }
+  }
+
+  /* 
+  set the MENU form content rendered within the BODY depending on which button of the HEADER's popup menu (register, login, settings) was clicked
+  change the chevron image to an "X" (close) with which the MENU can be closed
+  */
+  function changeMenuContent(e) {
+    setMenuContent(e.target.textContent);
+    setViewButton(close);
+  }
+
+  return (
+    <>
+      <Header
+        viewButton={viewButton}
+        popupImage={popupImage}
+        popupList={popupList}
+        username={username}
+        toggleView={toggleView}
+        togglePopupMenu={togglePopupMenu}
+      />
+    </>
+  );
 }
