@@ -1,3 +1,4 @@
 export default function Playlist() {
-  return <ul></ul>;
+  // placeholder/test code
+  return <div>Playlist</div>;
 }

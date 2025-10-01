@@ -104,6 +104,14 @@ export default function App() {
         toggleView={toggleView}
         togglePopupMenu={togglePopupMenu}
       />
+      <Body
+        viewButton={viewButton}
+        menuContent={menuContent}
+        playlistMode={playlistMode}
+        playlistData={playlistData}
+        setStatusMessage={setStatusMessage}
+        setUsername={setUsername}
+      />
       <Footer
         playlistMode={playlistMode}
         statusMessage={statusMessage}
