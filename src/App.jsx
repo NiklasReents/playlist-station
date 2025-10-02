@@ -12,6 +12,7 @@ import "./App.css";
 
 export default function App() {
   // GLOBAL VARIABLES (DRAFT: may be subject to change!)
+  const [screenSize, getSceenSize] = useState();
   const [viewButton, setViewButton] = useState(chevronRight); // -> pass variable and "toggleView" function to HEADER (for image display and setting purposes) and variable to BODY as well (for information purpose) via props
   const [popupImage, setPopupImage] = useState(menu); // -> pass variable and "togglePopupMenu" function to HEADER (for image display and setting purposes) via props
   const [popupList, setPopupList] = useState(<></>); // -> pass variable to HEADER and setter function to "togglePopupMenu" (in order to show or hide the popup menu list) via props
@@ -25,6 +26,11 @@ export default function App() {
   // set playlist data: get playlist data from dropdown menu in the HEADER by selecting one of the playlist names, which renders the respective playlist data into SONG components within the PLAYLIST container
   const [playlistData, setPlaylistData] = useState([]); // -> pass setter function to HEADER (for data retrieval purpose (from dropdown menu)) and variable to BODY -> PLAYLIST via props
   const statusMessageIdRef = useRef();
+
+  // get viewport width for responsive adjustment of BODY components
+  window.onresize = function () {
+    getSceenSize(this.innerWidth);
+  };
 
   /* 
   flip chevron image from right to left or the other way round with each click, which changes the content of the App BODY (via "viewButton" variable passed to it as props)
@@ -105,6 +111,7 @@ export default function App() {
         togglePopupMenu={togglePopupMenu}
       />
       <Body
+        screenSize={screenSize}
         viewButton={viewButton}
         menuContent={menuContent}
         playlistMode={playlistMode}
