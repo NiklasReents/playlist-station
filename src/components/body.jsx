@@ -23,6 +23,7 @@ export default function Body({
   );
   const menu = (
     <Menu
+      key={menuContent}
       menuContent={menuContent}
       setStatusMessage={setStatusMessage}
       setUsername={setUsername}
