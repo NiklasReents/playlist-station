@@ -2,6 +2,9 @@ import { useState, useRef } from "react";
 import Header from "./components/header.jsx";
 import Body from "./components/body.jsx";
 import Footer from "./components/footer.jsx";
+import Form from "./components/form.jsx";
+import Playlist from "./components/playlist.jsx";
+import Menu from "./components/menu.jsx";
 import chevronLeft from "./assets/chevron-left.svg";
 import chevronRight from "./assets/chevron-right.svg";
 import close from "./assets/close.svg";
@@ -12,7 +15,7 @@ import "./App.css";
 
 export default function App() {
   // GLOBAL VARIABLES (DRAFT: may be subject to change!)
-  const [screenSize, getSceenSize] = useState();
+  const [screenSize, getScreenSize] = useState(window.innerWidth);
   const [viewButton, setViewButton] = useState(chevronRight); // -> pass variable and "toggleView" function to HEADER (for image display and setting purposes) and variable to BODY as well (for information purpose) via props
   const [popupImage, setPopupImage] = useState(menu); // -> pass variable and "togglePopupMenu" function to HEADER (for image display and setting purposes) via props
   const [popupList, setPopupList] = useState(<></>); // -> pass variable to HEADER and setter function to "togglePopupMenu" (in order to show or hide the popup menu list) via props
@@ -26,10 +29,27 @@ export default function App() {
   // set playlist data: get playlist data from dropdown menu in the HEADER by selecting one of the playlist names, which renders the respective playlist data into SONG components within the PLAYLIST container
   const [playlistData, setPlaylistData] = useState([]); // -> pass setter function to HEADER (for data retrieval purpose (from dropdown menu)) and variable to BODY -> PLAYLIST via props
   const statusMessageIdRef = useRef();
+  // create JSX containers for use in the "setBody" function
+  const formJSX = <Form setStatusMessage={setStatusMessage} />;
+  const playlistJSX = (
+    <Playlist
+      playlistMode={playlistMode}
+      playlistData={playlistData}
+      setStatusMessage={setStatusMessage}
+    />
+  );
+  const menuJSX = (
+    <Menu
+      key={menuContent}
+      menuContent={menuContent}
+      setStatusMessage={setStatusMessage}
+      setUsername={setUsername}
+    />
+  );
 
   // get viewport width for responsive adjustment of BODY components
   window.onresize = function () {
-    getSceenSize(this.innerWidth);
+    getScreenSize(this.innerWidth);
   };
 
   /* 
@@ -100,6 +120,31 @@ export default function App() {
     }, 3000);
   }
 
+  // set the content of the body component depending on viewport width and user interactions (DRAFT)
+  function setBody() {
+    if (viewButton === chevronRight) {
+      return screenSize <= 1000 ? (
+        formJSX
+      ) : (
+        <>
+          {formJSX}
+          {playlistJSX}
+        </>
+      );
+    } else if (viewButton === chevronLeft) {
+      return screenSize <= 1000 ? (
+        playlistJSX
+      ) : (
+        <>
+          {playlistJSX}
+          {formJSX}
+        </>
+      );
+    } else {
+      return menuJSX;
+    }
+  }
+
   return (
     <>
       <Header
@@ -110,15 +155,7 @@ export default function App() {
         toggleView={toggleView}
         togglePopupMenu={togglePopupMenu}
       />
-      <Body
-        screenSize={screenSize}
-        viewButton={viewButton}
-        menuContent={menuContent}
-        playlistMode={playlistMode}
-        playlistData={playlistData}
-        setStatusMessage={setStatusMessage}
-        setUsername={setUsername}
-      />
+      <Body>{setBody()}</Body>
       <Footer
         playlistMode={playlistMode}
         statusMessage={statusMessage}
