@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useCookies } from "react-cookie";
 
 export default function Menu({
   menuContent,
@@ -8,23 +9,60 @@ export default function Menu({
   setRegisterData,
   setLoginData,
   setSettingsData,
+  setUsername,
+  setLoginButton,
 }) {
   const [fetchResult, setFetchResult] = useState("");
+  const [cookies, setCookie] = useCookies(["userToken"]);
   const formRef = useRef();
   const url =
-    "http://localhost:3000/users/" + menuContent.toLowerCase() + "-user";
+    menuContent !== "Settings"
+      ? "http://localhost:3000/users/" + menuContent.toLowerCase() + "-user"
+      : "";
   let formData = new FormData(formRef.current);
-
-  function updateFormData(setData, data, name, value) {
-    setData({ ...data, [name]: value });
-    formData.append(name, value);
-  }
   // initialize "formData" with the updated form output of each respective "MENU" component after the first render; may be subject to change
   useEffect(() => {
     if (menuContent !== "Settings") {
       formData = new FormData(formRef.current);
     }
   }, []);
+  // determine user registration and login UI output and data processing
+  function processResult(result) {
+    let currentUser;
+    switch (Object.keys(result)[0]) {
+      case "valErrors":
+        // display registration validation errors
+        setFetchResult(() => {
+          return result.valErrors.map((v, i) => {
+            return <div key={i}>{v.msg}</div>;
+          });
+        });
+        break;
+      case "loginData":
+        // user login (including token and user data storage in a cookie and the local storage)
+        currentUser = result.loginData[1].split(" ")[0];
+        setFetchResult(result.loginData[1]);
+        setUsername(currentUser);
+        setLoginButton("Logout");
+        setCookie("userToken", result.loginData[0], {
+          expires: new Date(new Date().setDate(new Date().getDate() + 1)),
+        });
+        localStorage.setItem("currentUser", currentUser);
+        location.href = "/";
+        break;
+      default:
+        // display simple registration and login (validation error) messages
+        setFetchResult(result.message);
+        if (result.message.includes("registration")) {
+          location.href = "/";
+        }
+    }
+  }
+  // update global user registration and login data and "formData" content
+  function updateFormData(setData, data, name, value) {
+    setData({ ...data, [name]: value });
+    formData.append(name, value);
+  }
 
   return (
     <>
@@ -38,10 +76,8 @@ export default function Menu({
               method: "POST",
               body: formData,
             });
-            if (!response.ok) {
-              setFetchResult(response.statusText);
-            }
-            setFetchResult(await response.text());
+            const result = await response.json();
+            processResult(result);
           } catch (err) {
             setFetchResult(err.message);
           }
@@ -203,7 +239,7 @@ export default function Menu({
         )}
       </form>
       {/*
-        for testing purposes only
+        display result of registration- and login-related actions
       */}
       {fetchResult}
     </>

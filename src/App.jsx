@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useCookies } from "react-cookie";
 import Header from "./components/header.jsx";
 import Body from "./components/body.jsx";
 import Footer from "./components/footer.jsx";
@@ -15,7 +16,8 @@ import "./App.css";
 
 export default function App() {
   // GLOBAL VARIABLES (DRAFT: may be subject to change!)
-  const [screenSize, getScreenSize] = useState(window.innerWidth);
+  const [cookies, setCookie, removeCookie] = useCookies(["userToken"]); // -> create a cookie in order to store a web token that will be sent with a request to a protected route granting access to the user's playlists
+  const [screenSize, getScreenSize] = useState(window.innerWidth); // -> track browser window width in order to responsively adjust the BODY layout
   const [viewButton, setViewButton] = useState(chevronRight); // -> pass variable and "toggleView" function to HEADER (for image display and setting purposes) and variable to BODY as well (for information purpose) via props
   const [popupImage, setPopupImage] = useState(menu); // -> pass variable and "togglePopupMenu" function to HEADER (for image display and setting purposes) via props
   const [popupList, setPopupList] = useState(<></>); // -> pass variable to HEADER and setter function to "togglePopupMenu" (in order to show or hide the popup menu list) via props
@@ -25,7 +27,16 @@ export default function App() {
   const [userStatus, setUserStatus] = useState(""); // -> call "useEffect" in the App function with a request to the server in order to determine whether both are connected to each other and save the result in the variable (via setter function); pass setter to MENU as well (to determine login status) via props
   const [statusMessage, setStatusMessage] = useState(""); // -> pass setter function to various components where certain events happen (e.g. FORM, PLAYLIST) and variable to FOOTER (for information/display purpose) via props ("useReducer" hook as alternative?)
   // set username: get username from server token after logging in (through the MENU login component), display current username in the top section of the HEADER
-  const [username, setUsername] = useState("User"); // -> pass setter function to MENU (for data retrieval purpose (from login)) and variable to HEADER (for display purpose) via props; save username in localstorage
+  const [username, setUsername] = useState(
+    localStorage.getItem("currentUser") && cookies.userToken
+      ? localStorage.getItem("currentUser")
+      : "User"
+  ); // -> pass setter function to MENU (for data retrieval purpose (from login)) and variable to HEADER (for display purpose) via props; save username in localstorage
+  const [loginButton, setLoginButton] = useState(
+    localStorage.getItem("currentUser") && cookies.userToken
+      ? "Logout"
+      : "Login"
+  ); // pass setter function to MENU and the "changeMenuContent" function for login and logout purposes
   // set playlist data: get playlist data from dropdown menu in the HEADER by selecting one of the playlist names, which renders the respective playlist data into SONG components within the PLAYLIST container
   const [playlistData, setPlaylistData] = useState([]); // -> pass setter function to HEADER (for data retrieval purpose (from dropdown menu)) and variable to BODY -> PLAYLIST via props
   // register user (may be refactored later)
@@ -52,6 +63,7 @@ export default function App() {
       setStatusMessage={setStatusMessage}
     />
   );
+  // try to reduce/condense number of props passed to MENU
   const menuJSX = (
     <Menu
       key={menuContent}
@@ -62,8 +74,8 @@ export default function App() {
       setRegisterData={setRegisterData}
       setLoginData={setLoginData}
       setSettingsData={setSettingsData}
-      setStatusMessage={setStatusMessage}
       setUsername={setUsername}
+      setLoginButton={setLoginButton}
     />
   );
 
@@ -94,7 +106,7 @@ export default function App() {
       setPopupList(
         <div onClick={(e) => changeMenuContent(e)}>
           <button>Register</button>
-          <button>Login</button>
+          <button>{loginButton}</button>
           <button>Settings</button>
         </div>
       );
@@ -110,8 +122,20 @@ export default function App() {
   change the chevron image to an "X" (close) with which the MENU can be closed
   */
   function changeMenuContent(e) {
-    setMenuContent(e.target.textContent);
-    setViewButton(close);
+    if (
+      localStorage.getItem("currentUser") &&
+      cookies.userToken &&
+      e.target.textContent === "Logout"
+    ) {
+      // user logout
+      setLoginButton("Login");
+      localStorage.removeItem("currentUser");
+      removeCookie("userToken");
+      location.href = "/";
+    } else {
+      setMenuContent(e.target.textContent);
+      setViewButton(close);
+    }
   }
 
   /* 
