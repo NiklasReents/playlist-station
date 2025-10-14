@@ -28,6 +28,20 @@ export default function App() {
   const [username, setUsername] = useState("User"); // -> pass setter function to MENU (for data retrieval purpose (from login)) and variable to HEADER (for display purpose) via props; save username in localstorage
   // set playlist data: get playlist data from dropdown menu in the HEADER by selecting one of the playlist names, which renders the respective playlist data into SONG components within the PLAYLIST container
   const [playlistData, setPlaylistData] = useState([]); // -> pass setter function to HEADER (for data retrieval purpose (from dropdown menu)) and variable to BODY -> PLAYLIST via props
+  // register user (may be refactored later)
+  const [registerData, setRegisterData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  // login user (may be refactored later)
+  const [loginData, setLoginData] = useState({ username: "", password: "" });
+  // change global app settings
+  const [settingsData, setSettingsData] = useState({
+    colorPrimary: "",
+    colorSecondary: "",
+    appLanguage: "",
+  });
   const statusMessageIdRef = useRef();
   // create JSX containers for use in the "setBody" function
   const formJSX = <Form setStatusMessage={setStatusMessage} />;
@@ -42,6 +56,12 @@ export default function App() {
     <Menu
       key={menuContent}
       menuContent={menuContent}
+      registerData={registerData}
+      loginData={loginData}
+      settingsData={settingsData}
+      setRegisterData={setRegisterData}
+      setLoginData={setLoginData}
+      setSettingsData={setSettingsData}
       setStatusMessage={setStatusMessage}
       setUsername={setUsername}
     />
