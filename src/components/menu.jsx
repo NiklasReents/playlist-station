@@ -6,26 +6,49 @@ export default function Menu({
   registerData,
   loginData,
   settingsData,
+  displayPWButton,
   setRegisterData,
   setLoginData,
   setSettingsData,
   setUsername,
   setLoginButton,
+  setDisplayPWButton,
 }) {
   const [fetchResult, setFetchResult] = useState("");
+  const [forgotPWMail, setForgotPWMail] = useState("");
   const [cookies, setCookie] = useCookies(["userToken"]);
   const formRef = useRef();
-  const url =
-    menuContent !== "Settings"
-      ? "http://localhost:3000/users/" + menuContent.toLowerCase() + "-user"
-      : "";
   let formData = new FormData(formRef.current);
-  // initialize "formData" with the updated form output of each respective "MENU" component after the first render; may be subject to change
+
   useEffect(() => {
     if (menuContent !== "Settings") {
+      // initialize "formData" with the updated form output of each respective "MENU" component after the first render; may be subject to change
       formData = new FormData(formRef.current);
+
+      if (displayPWButton) {
+        // keep the "Forgot Password" button with the correct email if an associated username remains in the username input of the login form between renders; may be subject to change
+        renderForgotPWButton(null, loginData.username);
+      }
     }
   }, []);
+  // send "formData" object to web server for user registration and login
+  async function sendUserData(e) {
+    e.preventDefault();
+    const url =
+      menuContent !== "Settings"
+        ? "http://localhost:3000/users/" + menuContent.toLowerCase() + "-user"
+        : "";
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+      processResult(result);
+    } catch (err) {
+      setFetchResult(err.message);
+    }
+  }
   // determine user registration and login UI output and data processing
   function processResult(result) {
     let currentUser;
@@ -63,24 +86,43 @@ export default function Menu({
     setData({ ...data, [name]: value });
     formData.append(name, value);
   }
+  // display the "Forgot Password" button in the login form when a valid name is entered into the username input
+  async function renderForgotPWButton(e, username) {
+    const emailParam = e ? e.target.value : username;
+    const url =
+      "http://localhost:3000/users/forgot-password?user=" + emailParam;
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
+      if (result.email) {
+        setForgotPWMail(result.email);
+        setDisplayPWButton(true);
+      } else {
+        setForgotPWMail("");
+        setDisplayPWButton(false);
+      }
+    } catch (err) {
+      setFetchResult(err.message);
+    }
+  }
+  // send an message with a link to a password reset route to the user's email address when clicking on the "Forgot Password" button
+  async function sendForgotPWMail() {
+    const url = "http://localhost:3000/users/send-mail?email=" + forgotPWMail;
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
+      setFetchResult(result.message);
+    } catch (err) {
+      setFetchResult(err.message);
+    }
+  }
 
   return (
     <>
       <h1>{menuContent}</h1>
       <form
-        onSubmit={async (e) => {
-          // send "formData" object to web server for user registration and login
-          e.preventDefault();
-          try {
-            const response = await fetch(url, {
-              method: "POST",
-              body: formData,
-            });
-            const result = await response.json();
-            processResult(result);
-          } catch (err) {
-            setFetchResult(err.message);
-          }
+        onSubmit={(e) => {
+          sendUserData(e);
         }}
         ref={formRef}
       >
@@ -146,6 +188,7 @@ export default function Menu({
             <label htmlFor="username">Username: </label>
             <input
               onChange={(e) => {
+                renderForgotPWButton(e, null);
                 updateFormData(
                   setLoginData,
                   loginData,
@@ -179,7 +222,15 @@ export default function Menu({
               required
             />
             <br />
-            <input type="button" value="Forgot Password" />
+            {displayPWButton ? (
+              <input
+                onClick={sendForgotPWMail}
+                type="button"
+                value="Forgot Password"
+              />
+            ) : (
+              ""
+            )}
             <br />
           </>
         ) : (

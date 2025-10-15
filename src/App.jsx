@@ -36,7 +36,8 @@ export default function App() {
     localStorage.getItem("currentUser") && cookies.userToken
       ? "Logout"
       : "Login"
-  ); // pass setter function to MENU and the "changeMenuContent" function for login and logout purposes
+  ); // -> pass setter function to MENU and the "changeMenuContent" function for login and logout purposes
+  const [displayPWButton, setDisplayPWButton] = useState(false); // -> pass variable and setter to MENU in order to display or hide a "Forgot Password" button in the login form
   // set playlist data: get playlist data from dropdown menu in the HEADER by selecting one of the playlist names, which renders the respective playlist data into SONG components within the PLAYLIST container
   const [playlistData, setPlaylistData] = useState([]); // -> pass setter function to HEADER (for data retrieval purpose (from dropdown menu)) and variable to BODY -> PLAYLIST via props
   // register user (may be refactored later)
@@ -71,11 +72,13 @@ export default function App() {
       registerData={registerData}
       loginData={loginData}
       settingsData={settingsData}
+      displayPWButton={displayPWButton}
       setRegisterData={setRegisterData}
       setLoginData={setLoginData}
       setSettingsData={setSettingsData}
       setUsername={setUsername}
       setLoginButton={setLoginButton}
+      setDisplayPWButton={setDisplayPWButton}
     />
   );
 
