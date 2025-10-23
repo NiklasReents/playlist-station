@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useCookies } from "react-cookie";
 
 export default function Menu({
   menuContent,
@@ -7,16 +6,14 @@ export default function Menu({
   loginData,
   settingsData,
   displayPWButton,
+  loginUser,
   setRegisterData,
   setLoginData,
   setSettingsData,
-  setUsername,
-  setLoginButton,
   setDisplayPWButton,
 }) {
   const [fetchResult, setFetchResult] = useState("");
   const [forgotPWMail, setForgotPWMail] = useState("");
-  const [cookies, setCookie] = useCookies(["userToken"]);
   const formRef = useRef();
   let formData = new FormData(formRef.current);
 
@@ -51,7 +48,6 @@ export default function Menu({
   }
   // determine user registration and login UI output and data processing
   function processResult(result) {
-    let currentUser;
     switch (Object.keys(result)[0]) {
       case "valErrors":
         // display registration validation errors
@@ -62,16 +58,7 @@ export default function Menu({
         });
         break;
       case "loginData":
-        // user login (including token and user data storage in a cookie and the local storage)
-        currentUser = result.loginData[1].split(" ")[0];
-        setFetchResult(result.loginData[1]);
-        setUsername(currentUser);
-        setLoginButton("Logout");
-        setCookie("userToken", result.loginData[0], {
-          expires: new Date(new Date().setDate(new Date().getDate() + 1)),
-        });
-        localStorage.setItem("currentUser", currentUser);
-        location.href = "/";
+        loginUser(result, setFetchResult);
         break;
       default:
         // display simple registration and login (validation error) messages
@@ -105,7 +92,7 @@ export default function Menu({
       setFetchResult(err.message);
     }
   }
-  // send an message with a link to a password reset route to the user's email address when clicking on the "Forgot Password" button
+  // send a message with a link to a password reset route to the user's email address when clicking on the "Forgot Password" button
   async function sendForgotPWMail() {
     const url = "http://localhost:3000/users/send-mail?email=" + forgotPWMail;
     try {
