@@ -219,6 +219,8 @@ export default function App() {
       <Footer
         playlistMode={playlistMode}
         statusMessage={statusMessage}
+        logoutUser={logoutUser}
+        changeStatusMessage={changeStatusMessage}
         togglePlaylistMode={togglePlaylistMode}
       />
     </>
