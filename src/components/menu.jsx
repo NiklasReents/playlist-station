@@ -15,6 +15,7 @@ export default function Menu({
   const [fetchResult, setFetchResult] = useState("");
   const [forgotPWMail, setForgotPWMail] = useState("");
   const formRef = useRef();
+  const serverRoot = import.meta.env.VITE_SERVER_ROOT;
   let formData = new FormData(formRef.current);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function Menu({
     e.preventDefault();
     const url =
       menuContent !== "Settings"
-        ? "http://localhost:3000/users/" + menuContent.toLowerCase() + "-user"
+        ? `${serverRoot}/users/${menuContent.toLowerCase()}-user`
         : "";
     try {
       const response = await fetch(url, {
@@ -76,8 +77,7 @@ export default function Menu({
   // display the "Forgot Password" button in the login form when a valid name is entered into the username input
   async function renderForgotPWButton(e, username) {
     const emailParam = e ? e.target.value : username;
-    const url =
-      "http://localhost:3000/users/forgot-password?user=" + emailParam;
+    const url = `${serverRoot}/users/forgot-password?user=${emailParam}`;
     try {
       const response = await fetch(url);
       const result = await response.json();
@@ -94,7 +94,7 @@ export default function Menu({
   }
   // send a message with a link to a password reset route to the user's email address when clicking on the "Forgot Password" button
   async function sendForgotPWMail() {
-    const url = "http://localhost:3000/users/send-mail?email=" + forgotPWMail;
+    const url = `${serverRoot}/users/send-mail?email=${forgotPWMail}`;
     try {
       const response = await fetch(url);
       const result = await response.json();

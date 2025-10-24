@@ -9,11 +9,12 @@ export default function Footer({
 }) {
   const [cookies] = useCookies(["userToken"]);
   const formData = new FormData();
+  const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
   async function deleteUser() {
     try {
       formData.set("username", localStorage.getItem("currentUser"));
-      const url = "http://localhost:3000/users/delete-user";
+      const url = `${serverRoot}/users/delete-user`;
       const response = await fetch(url, {
         method: "DELETE",
         body: formData,
