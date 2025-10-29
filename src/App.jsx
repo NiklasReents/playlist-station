@@ -22,6 +22,9 @@ export default function App() {
   const [popupImage, setPopupImage] = useState(menu); // -> pass variable and "togglePopupMenu" function to HEADER (for image display and setting purposes) via props
   const [popupList, setPopupList] = useState(<></>); // -> pass variable to HEADER and setter function to "togglePopupMenu" (in order to show or hide the popup menu list) via props
   const [menuContent, setMenuContent] = useState(""); // -> pass this setter function and "setViewButton" to "changeMenuContent" function (used by "togglePopupMenu" for data retrieval/setting purposes) and this variable to BODY -> MENU (for information purpose) via props
+  const [formDisabled, setFormDisabled] = useState(
+    cookies.userToken && localStorage.getItem("currentUser") ? false : true
+  ); // -> pass variable to FORM and setter to "loginUser" and "logoutUser" functions
   const [playlistMode, setPlaylistMode] = useState(list); // -> pass variable and toggle function to FOOTER (for display and setting purposes) and variable to BODY -> PLAYLIST (for information purpose) via props
   // set user status: determine whether a user is currently not connected to the server, connected but not logged in, connected and logged in (some actions and status messages depend on the connection and login status)
   const [userStatus, setUserStatus] = useState(""); // -> call "useEffect" in the App function with a request to the server in order to determine whether both are connected to each other and save the result in the variable (via setter function)
@@ -40,6 +43,15 @@ export default function App() {
   const [displayPWButton, setDisplayPWButton] = useState(false); // -> pass variable and setter to MENU in order to display or hide a "Forgot Password" button in the login form
   // set playlist data: get playlist data from dropdown menu in the HEADER by selecting one of the playlist names, which renders the respective playlist data into SONG components within the PLAYLIST container
   const [playlistData, setPlaylistData] = useState([]); // -> pass setter function to HEADER (for data retrieval purpose (from dropdown menu)) and variable to BODY -> PLAYLIST via props
+  // set form data for playlist creation
+  const [playlistFormData, setPlaylistFormData] = useState({
+    playlist: "",
+    image: "",
+    audio: "",
+    song: "",
+    artist: "",
+    genre: "",
+  }); // pass variable and setter to FORM component via props
   // set user registration data (may be refactored later)
   const [registerData, setRegisterData] = useState({
     username: "",
@@ -64,7 +76,14 @@ export default function App() {
     </div>
   );
   // create JSX containers for use in the "setBody" function
-  const formJSX = <Form setStatusMessage={setStatusMessage} />;
+  const formJSX = (
+    <Form
+      formDisabled={formDisabled}
+      playlistFormData={playlistFormData}
+      setPlaylistFormData={setPlaylistFormData}
+      changeStatusMessage={changeStatusMessage}
+    />
+  );
   const playlistJSX = (
     <Playlist
       playlistMode={playlistMode}
@@ -139,6 +158,7 @@ export default function App() {
     setPopupList(<></>);
     setUsername(currentUser);
     setLoginButton("Logout");
+    setFormDisabled(false);
     setCookie("userToken", result.loginData[0], {
       expires: new Date(new Date().setDate(new Date().getDate() + 1)),
     });
@@ -152,6 +172,13 @@ export default function App() {
     setPopupList(<></>);
     setUsername("User");
     setLoginButton("Login");
+    setFormDisabled(true);
+    setPlaylistFormData(() => {
+      for (const key in playlistFormData) {
+        playlistFormData[key] = "";
+      }
+      return playlistFormData;
+    });
     removeCookie("userToken");
     localStorage.removeItem("currentUser");
     changeStatusMessage("You have successfully logged out.");
