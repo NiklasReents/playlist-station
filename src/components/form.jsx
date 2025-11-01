@@ -4,6 +4,7 @@ export default function Form({
   formDisabled,
   playlistFormData,
   setPlaylistFormData,
+  setUploadMessage,
   changeStatusMessage,
 }) {
   const [fetchResult, setFetchResult] = useState("");
@@ -34,6 +35,7 @@ export default function Form({
           });
         });
       } else {
+        setUploadMessage(result.message);
         changeStatusMessage(result.message);
       }
     } catch (err) {
