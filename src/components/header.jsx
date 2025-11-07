@@ -1,64 +1,59 @@
 import { useState, useEffect } from "react";
 
-export default function Header({
-  viewButton,
-  popupImage,
-  popupList,
-  username,
-  uploadMessage,
-  changeStatusMessage,
-  setPlaylistData,
-  toggleView,
-  togglePopupMenu,
-}) {
+export default function Header(props) {
   const [playlistOptions, setPlaylistOptions] = useState(
     <option>Default</option>
   );
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
+  const url = `${serverRoot}/playlists/get-playlistnames`;
 
   async function getPlaylistNames() {
-    const url = `${serverRoot}/playlists/get-playlists`;
     try {
       const response = await fetch(url, { credentials: "include" });
       const result = await response.json();
       if (result.error) {
         setPlaylistOptions(<option>Default</option>);
-        changeStatusMessage(result.error);
+        props.changeStatusMessage(result.error);
       } else {
         setPlaylistOptions(
           result.playlistNames.map((v, i) => {
             return <option key={i}>{v.playlist}</option>;
           })
         );
-        changeStatusMessage(result.success);
+        props.changeStatusMessage(result.success);
       }
     } catch (err) {
-      changeStatusMessage(err.message);
+      props.changeStatusMessage(err.message);
     }
   }
 
   useEffect(() => {
     getPlaylistNames();
-  }, [username, uploadMessage]);
+  }, [props.username, props.uploadId]);
 
   return (
     <header>
       <div>
-        <img onClick={toggleView} src={viewButton} alt="chevron" />
+        <img onClick={props.toggleView} src={props.viewButton} alt="chevron" />
       </div>
       <div>
-        <div>Welcome, {username}</div>
+        <div>Welcome, {props.username}</div>
         <select
           onChange={(e) => {
-            setPlaylistData(e.target.value);
+            props.setPlaylistData(e.target.value);
+            props.changeStatusMessage(`Playlist ${e.target.value} selected!`);
           }}
         >
           {playlistOptions}
         </select>
       </div>
       <div>
-        <img onClick={togglePopupMenu} src={popupImage} alt="menu" />
-        {popupList}
+        <img
+          onClick={props.togglePopupMenu}
+          src={props.popupImage}
+          alt="menu"
+        />
+        {props.popupList}
       </div>
     </header>
   );

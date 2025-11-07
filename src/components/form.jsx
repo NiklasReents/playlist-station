@@ -1,27 +1,22 @@
 import { useRef, useState, useEffect } from "react";
 
-export default function Form({
-  formDisabled,
-  playlistFormData,
-  setPlaylistFormData,
-  setUploadMessage,
-  changeStatusMessage,
-}) {
-  const [fetchResult, setFetchResult] = useState("");
+export default function Form(props) {
+  const [validationResult, setValidationResult] = useState("");
   const formRef = useRef();
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
+  const url = `${serverRoot}/playlists/create-playlist`;
   let formData = new FormData(formRef.current);
 
   useEffect(() => {
     formData = new FormData(formRef.current);
   }, []);
 
-  async function sendUserData(e) {
+  // send "formData" object to web server for playlist creation and song addition
+  async function sendPlaylistData(e) {
     // NOTE: create formData here?
-    // NOTE: "playlistFormData" -> two-way data binding (apparently) does not work with files! Alternative?
-    e.preventDefault();
-    const url = `${serverRoot}/playlists/create-playlist`;
+    // NOTE: "props.playlistFormData" -> two-way data binding (apparently) does not work with files! Alternative?
     try {
+      e.preventDefault();
       const response = await fetch(url, {
         method: "post",
         credentials: "include",
@@ -29,22 +24,23 @@ export default function Form({
       });
       const result = await response.json();
       if (result.valErrors) {
-        setFetchResult(() => {
+        setValidationResult(() => {
           return result.valErrors.map((v, i) => {
             return <div key={i}>{v.msg}</div>;
           });
         });
       } else {
-        setUploadMessage(result.message);
-        changeStatusMessage(result.message);
+        props.setUploadId(crypto.randomUUID());
+        props.changeStatusMessage(result.success);
       }
     } catch (err) {
-      changeStatusMessage(err.message);
+      props.changeStatusMessage(err.message);
     }
   }
 
+  // update global playlist data and "formData" content
   function updateFormData(name, value) {
-    setPlaylistFormData({ ...playlistFormData, [name]: value });
+    props.setPlaylistFormData({ ...props.playlistFormData, [name]: value });
     formData.append(name, value);
   }
 
@@ -52,7 +48,7 @@ export default function Form({
     <>
       <form
         onSubmit={(e) => {
-          sendUserData(e);
+          sendPlaylistData(e);
         }}
         ref={formRef}
         encType="multipart/form-data"
@@ -65,9 +61,9 @@ export default function Form({
             id="playlist"
             name="playlist"
             placeholder="Playlist"
-            value={playlistFormData.playlist}
+            value={props.playlistFormData.playlist}
             required
-            disabled={formDisabled}
+            disabled={props.formDisabled}
           />
         </div>
         <br />
@@ -78,19 +74,19 @@ export default function Form({
             type="file"
             id="image"
             name="image"
-            value={playlistFormData.image}
+            value={props.playlistFormData.image}
             accept="image/*"
             required
-            disabled={formDisabled}
+            disabled={props.formDisabled}
           />
-          <input type="button" value="&#x21c4;" disabled={formDisabled} />
+          <input type="button" value="&#x21c4;" disabled={props.formDisabled} />
           <input
             onClick={() => {
               updateFormData("image", "");
             }}
             type="button"
             value="X"
-            disabled={formDisabled}
+            disabled={props.formDisabled}
           />
         </div>
         <br />
@@ -101,10 +97,10 @@ export default function Form({
             type="file"
             id="audio"
             name="audio"
-            value={playlistFormData.audio}
+            value={props.playlistFormData.audio}
             accept="audio/*"
             required
-            disabled={formDisabled}
+            disabled={props.formDisabled}
           />
           <input
             onClick={() => {
@@ -112,7 +108,7 @@ export default function Form({
             }}
             type="button"
             value="X"
-            disabled={formDisabled}
+            disabled={props.formDisabled}
           />
         </div>
         <br />
@@ -124,9 +120,9 @@ export default function Form({
             id="song"
             name="song"
             placeholder="Song"
-            value={playlistFormData.song}
+            value={props.playlistFormData.song}
             required
-            disabled={formDisabled}
+            disabled={props.formDisabled}
           />
         </div>
         <br />
@@ -138,9 +134,9 @@ export default function Form({
             id="artist"
             name="artist"
             placeholder="Artist"
-            value={playlistFormData.artist}
+            value={props.playlistFormData.artist}
             required
-            disabled={formDisabled}
+            disabled={props.formDisabled}
           />
         </div>
         <br />
@@ -152,16 +148,19 @@ export default function Form({
             id="genre"
             name="genre"
             placeholder="Genre"
-            value={playlistFormData.genre}
+            value={props.playlistFormData.genre}
             required
-            disabled={formDisabled}
+            disabled={props.formDisabled}
           />
         </div>
         <br />
-        <input type="submit" value="Send Data" disabled={formDisabled} />
+        <input type="submit" value="Send Data" disabled={props.formDisabled} />
         <br />
       </form>
-      {fetchResult}
+      {/*
+        display validation error messages
+      */}
+      {validationResult}
     </>
   );
 }
