@@ -85,8 +85,9 @@ export default function App() {
   );
   const playlistJSX = (
     <Playlist
-      playlistMode={playlistMode}
       playlistData={playlistData}
+      uploadId={uploadId}
+      playlistMode={playlistMode}
       changeStatusMessage={changeStatusMessage}
     />
   );
@@ -214,6 +215,7 @@ export default function App() {
       setStatusMessage((prevMessages) =>
         prevMessages.filter((msg) => msg.key !== messageKey)
       );
+      // TODO: fix bug where some messages stay in the UI
     }, 3000);
   }
 
