@@ -1,11 +1,11 @@
-import { useState } from "react";
 import { useCookies } from "react-cookie";
+import { useState } from "react";
 import Header from "./components/header.jsx";
 import Body from "./components/body.jsx";
-import Footer from "./components/footer.jsx";
 import Form from "./components/form.jsx";
-import Playlist from "./components/playlist.jsx";
 import Menu from "./components/menu.jsx";
+import Playlist from "./components/playlist.jsx";
+import Footer from "./components/footer.jsx";
 import chevronLeft from "./assets/chevron-left.svg";
 import chevronRight from "./assets/chevron-right.svg";
 import close from "./assets/close.svg";
@@ -15,32 +15,29 @@ import shuffle from "./assets/shuffle.svg";
 import "./App.css";
 
 export default function App() {
-  const [cookies, setCookie, removeCookie] = useCookies(["userToken"]); // -> create a cookie in order to store a web token that will be sent with a request to a protected route granting access to the user's playlists
-  const [screenSize, getScreenSize] = useState(window.innerWidth); // -> track browser window width in order to responsively adjust the BODY layout
-  const [viewButton, setViewButton] = useState(chevronRight); // -> pass variable and "toggleView" function to HEADER (for image display and setting purposes) and variable to BODY as well (for information purpose) via props
-  const [popupImage, setPopupImage] = useState(menu); // -> pass variable and "togglePopupMenu" function to HEADER (for image display and setting purposes) via props
-  const [popupList, setPopupList] = useState(<></>); // -> pass variable to HEADER and setter function to "togglePopupMenu" (in order to show or hide the popup menu list) via props
-  const [menuContent, setMenuContent] = useState(""); // -> pass this setter function and "setViewButton" to "changeMenuContent" function (used by "togglePopupMenu" for data retrieval/setting purposes) and this variable to BODY -> MENU (for information purpose) via props
-  const [formDisabled, setFormDisabled] = useState(
-    cookies.userToken && localStorage.getItem("currentUser") ? false : true
-  ); // -> pass variable to FORM and setter to "loginUser" and "logoutUser" functions
-  const [playlistMode, setPlaylistMode] = useState(list); // -> pass variable and toggle function to FOOTER (for display and setting purposes) and variable to BODY -> PLAYLIST (for information purpose) via props
-  const [statusMessage, setStatusMessage] = useState([]); // -> pass setter function to "changeStatusMessage" which is passed to components where certain events happen (e.g. FORM, PLAYLIST) and variable to FOOTER (for information/display purpose) via props
-  // set username: get username from server token after logging in (through the "loginUser" function), display current username in the top section of the HEADER
+  // variable groups (grouped according to where variables are (mainly) used)
+  // APP
+  const [cookies, setCookie, removeCookie] = useCookies(["userToken"]); // -> create a cookie in order to store a web token that will be sent with various requests to protected routes (e.g. granting access to the user's playlists etc.)
+  const [screenSize, getScreenSize] = useState(window.innerWidth); // -> pass variable to "setBody" function (information) and setter to "window.onresize" function
+  // HEADER
+  const [viewButton, setViewButton] = useState(chevronRight); // -> pass variable to HEADER (display) and "toggleView"/"setBody" functions (information) and setter to "toggleView", "changeMenuContent", "loginUser" and "logoutUser" functions
+  const [popupImage, setPopupImage] = useState(menu); // -> pass variable to HEADER (display) and "togglePopupMenu" function (information) and setter to "togglePopupMenu", "loginUser" and "logoutUser" functions
+  const [popupList, setPopupList] = useState(<></>); // -> pass variable to HEADER (display) and setter to "togglePopupMenu", "loginUser" and "logoutUser" functions
   const [username, setUsername] = useState(
     cookies.userToken && localStorage.getItem("currentUser")
       ? localStorage.getItem("currentUser")
       : "User"
-  ); // -> pass setter function to "loginUser" and "logoutUser" functions (for data retrieval and setting purposes) and variable to HEADER (for display purpose) via props; save username in localstorage
+  ); // -> pass variable to HEADER (display) and "changeMenuContent" function (information) and setter to "loginUser" and "logoutUser" functions
   const [loginButton, setLoginButton] = useState(
     cookies.userToken && localStorage.getItem("currentUser")
       ? "Logout"
       : "Login"
-  ); // -> pass setter function to to "loginUser" and "logoutUser" functions and the variable to the "popupJSX" component (to be rendered in HEADER)
-  const [displayPWButton, setDisplayPWButton] = useState(false); // -> pass variable and setter to MENU in order to display or hide a "Forgot Password" button in the login form
-  // set playlist data: get playlist data from dropdown menu in the HEADER by selecting one of the playlist names, which renders the respective playlist data into SONG components within the PLAYLIST container
-  const [playlistData, setPlaylistData] = useState([]); // -> pass setter function to HEADER (for data retrieval purpose (from dropdown menu)) and variable to BODY -> PLAYLIST via props
-  const [uploadId, setUploadId] = useState(0); // -> pass setter function to FORM and variable to HEADER via props
+  ); // -> pass variable to "popupJSX" (HEADER) component (display) and setter to "loginUser" and "logoutUser" functions
+  const [uploadId, setUploadId] = useState(0); // -> pass variable to HEADER (information) and setter function to FORM
+  // BODY (-> FORM, MENU, PLAYLIST)
+  const [formDisabled, setFormDisabled] = useState(
+    cookies.userToken && localStorage.getItem("currentUser") ? false : true
+  ); // -> pass variable to FORM (information) and setter to "loginUser" and "logoutUser" functions
   // set form data for playlist creation
   const [playlistFormData, setPlaylistFormData] = useState({
     playlist: "",
@@ -49,21 +46,27 @@ export default function App() {
     song: "",
     artist: "",
     genre: "",
-  }); // pass variable and setter to FORM component via props
+  }); // -> pass variable to FORM (information/display) and "logoutUser" function (information/display cleanup) and setter to the same component and function, respectively
+  const [menuContent, setMenuContent] = useState(""); // -> pass variable to MENU (information) and setter to "changeMenuContent" function
   // set user registration data (may be refactored later)
   const [registerData, setRegisterData] = useState({
     username: "",
     email: "",
     password: "",
-  }); // -> pass variable and setter to MENU component via props
+  }); // -> pass variable to MENU (information/display) and setter to the same component
   // set user login data (may be refactored later)
-  const [loginData, setLoginData] = useState({ username: "", password: "" }); // -> pass variable and setter to MENU component via props
+  const [loginData, setLoginData] = useState({ username: "", password: "" }); // -> pass variable to MENU (information/display) and setter to the same component
   // change global app settings (may be refactored later)
   const [settingsData, setSettingsData] = useState({
     colorPrimary: "",
     colorSecondary: "",
     appLanguage: "",
-  }); // -> pass variable and setter to MENU component via props
+  }); // -> pass variable to MENU (information/display) and setter to the same component
+  const [displayPWButton, setDisplayPWButton] = useState(false); // -> pass variable to MENU (information) and setter to the same component
+  const [playlistData, setPlaylistData] = useState([]); // -> pass variable to PLAYLIST (information) and setter to HEADER
+  const [playlistMode, setPlaylistMode] = useState(list); // -> pass variable to PLAYLIST (information), FOOTER (display) and "togglePlaylistMode" function (information) and setter to the same function
+  // FOOTER
+  const [statusMessage, setStatusMessage] = useState([]); // -> pass variable to FOOTER (display) and to "changeStatusMessage" function (information) and setter to the same function
 
   // create JSX container for use in the "togglePopupMenu" function
   const popupJSX = (
@@ -83,15 +86,7 @@ export default function App() {
       changeStatusMessage={changeStatusMessage}
     />
   );
-  const playlistJSX = (
-    <Playlist
-      playlistData={playlistData}
-      uploadId={uploadId}
-      playlistMode={playlistMode}
-      changeStatusMessage={changeStatusMessage}
-    />
-  );
-  // NOTE: try to reduce/condense number of props passed to MENU
+  // NOTE: try to reduce/condense number of props passed to MENU (and some other components)
   const menuJSX = (
     <Menu
       key={menuContent}
@@ -107,6 +102,9 @@ export default function App() {
       setSettingsData={setSettingsData}
       setDisplayPWButton={setDisplayPWButton}
     />
+  );
+  const playlistJSX = (
+    <Playlist playlistData={playlistData} playlistMode={playlistMode} />
   );
 
   // get viewport width for responsive adjustment of BODY components
@@ -192,7 +190,7 @@ export default function App() {
 
   /* 
   toggle between list and shuffle modes with each click which affects the way playlist songs are played (via "playlistMode" variable passed to PLAYLIST as props)
-  set "statusMessage" according to toggled playlist mode
+  call "changeStatusMessage" according to toggled playlist mode
   */
   function togglePlaylistMode() {
     if (playlistMode === list) {
@@ -205,7 +203,7 @@ export default function App() {
   }
 
   /*
-  display status messages in the FOOTER that get triggered by certain user actions (pressing the "Send Data" button of the song FORM, changing the playlist mode, deleting songs etc.); 
+  display status messages in the FOOTER that get triggered by certain user actions (pressing the "Send Data" button of the song FORM, changing the playlist mode, deleting songs etc.)
   */
   function changeStatusMessage(messageText) {
     const messageKey = crypto.randomUUID();
@@ -215,11 +213,11 @@ export default function App() {
       setStatusMessage((prevMessages) =>
         prevMessages.filter((msg) => msg.key !== messageKey)
       );
-      // TODO: fix bug where some messages stay in the UI
+      // TODO: fix bug where in some cases some messages stay in the UI
     }, 3000);
   }
 
-  // set the content of the body component depending on viewport width and user interactions
+  // set the content of the BODY component depending on viewport width and certain user interactions
   function setBody() {
     if (viewButton === chevronRight) {
       return screenSize <= 1000 ? (

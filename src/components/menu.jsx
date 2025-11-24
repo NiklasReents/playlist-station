@@ -1,28 +1,22 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export default function Menu(props) {
   const [validationResult, setValidationResult] = useState("");
   const [forgotPWMail, setForgotPWMail] = useState("");
-  const formRef = useRef();
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
-  let formData = new FormData(formRef.current);
 
   useEffect(() => {
-    if (props.menuContent !== "Settings") {
-      // initialize "formData" with the updated form output of each respective "MENU" component after the first render; may be subject to change
-      formData = new FormData(formRef.current);
-
-      if (props.displayPWButton) {
-        // keep the "Forgot Password" button with the correct email if an associated username remains in the username input of the login form between renders; may be subject to change
-        renderForgotPWButton(null, props.loginData.username);
-      }
+    if (props.menuContent === "Login" && props.displayPWButton) {
+      // keep the "Forgot Password" button with the correct email if an associated username remains in the username input of the login form between renders; may be subject to change
+      renderForgotPWButton(null, props.loginData.username);
     }
-  }, []);
+  }, [props.menuContent]);
 
   // send "formData" object to web server for user registration and login
   async function sendUserData(e) {
     try {
       e.preventDefault();
+      const formData = new FormData(e.target);
       const userURL =
         props.menuContent !== "Settings"
           ? `${serverRoot}/users/${props.menuContent.toLowerCase()}-user`
@@ -44,8 +38,8 @@ export default function Menu(props) {
       case "valErrors":
         // display registration validation errors
         setValidationResult(() => {
-          return result.valErrors.map((v, i) => {
-            return <div key={i}>{v.msg}</div>;
+          return result.valErrors.map((v) => {
+            return <div key={v.msg}>{v.msg}</div>;
           });
         });
         break;
@@ -61,12 +55,6 @@ export default function Menu(props) {
       default:
         props.changeStatusMessage(result.error);
     }
-  }
-
-  // update global user registration and login data and "formData" content
-  function updateFormData(setData, data, name, value) {
-    setData({ ...data, [name]: value });
-    formData.append(name, value);
   }
 
   // display the "Forgot Password" button in the login form if a valid user name is entered into the username input
@@ -107,19 +95,16 @@ export default function Menu(props) {
         onSubmit={(e) => {
           sendUserData(e);
         }}
-        ref={formRef}
       >
         {props.menuContent === "Register" ? (
           <>
             <label htmlFor="username">Username: </label>
             <input
               onChange={(e) => {
-                updateFormData(
-                  props.setRegisterData,
-                  props.registerData,
-                  e.target.name,
-                  e.target.value
-                );
+                props.setRegisterData({
+                  ...props.registerData,
+                  [e.target.name]: e.target.value,
+                });
               }}
               type="text"
               id="username"
@@ -132,12 +117,10 @@ export default function Menu(props) {
             <label htmlFor="email">Email: </label>
             <input
               onChange={(e) => {
-                updateFormData(
-                  props.setRegisterData,
-                  props.registerData,
-                  e.target.name,
-                  e.target.value
-                );
+                props.setRegisterData({
+                  ...props.registerData,
+                  [e.target.name]: e.target.value,
+                });
               }}
               type="email"
               id="email"
@@ -150,12 +133,10 @@ export default function Menu(props) {
             <label htmlFor="password">Password: </label>
             <input
               onChange={(e) => {
-                updateFormData(
-                  props.setRegisterData,
-                  props.registerData,
-                  e.target.name,
-                  e.target.value
-                );
+                props.setRegisterData({
+                  ...props.registerData,
+                  [e.target.name]: e.target.value,
+                });
               }}
               type="password"
               id="password"
@@ -172,12 +153,10 @@ export default function Menu(props) {
             <input
               onChange={(e) => {
                 renderForgotPWButton(e, null);
-                updateFormData(
-                  props.setLoginData,
-                  props.loginData,
-                  e.target.name,
-                  e.target.value
-                );
+                props.setLoginData({
+                  ...props.loginData,
+                  [e.target.name]: e.target.value,
+                });
               }}
               type="text"
               id="username"
@@ -190,12 +169,10 @@ export default function Menu(props) {
             <label htmlFor="password">Password: </label>
             <input
               onChange={(e) => {
-                updateFormData(
-                  props.setLoginData,
-                  props.loginData,
-                  e.target.name,
-                  e.target.value
-                );
+                props.setLoginData({
+                  ...props.loginData,
+                  [e.target.name]: e.target.value,
+                });
               }}
               type="password"
               id="password"

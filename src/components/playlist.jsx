@@ -8,6 +8,7 @@ export default function Playlist(props) {
         return (
           <Song
             key={v._id}
+            id={v._id}
             image={v.image.replace("public", "")}
             audio={v.audio.replace("public", "")}
             song={v.song}

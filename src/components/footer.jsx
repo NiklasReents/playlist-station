@@ -2,15 +2,15 @@ import { useCookies } from "react-cookie";
 
 export default function Footer(props) {
   const [cookies] = useCookies(["userToken"]);
-  const formData = new FormData();
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
-  const url = `${serverRoot}/users/delete-user`;
 
   // delete the logged in user and their playlist data
   async function deleteUser() {
     try {
+      const formData = new FormData();
       formData.set("username", localStorage.getItem("currentUser"));
-      const response = await fetch(url, {
+      const deletionUrl = `${serverRoot}/users/delete-user`;
+      const response = await fetch(deletionUrl, {
         method: "DELETE",
         body: formData,
       });

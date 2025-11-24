@@ -1,23 +1,17 @@
-import { useRef, useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Form(props) {
   const [validationResult, setValidationResult] = useState("");
-  const formRef = useRef();
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
-  const url = `${serverRoot}/playlists/create-playlist`;
-  let formData = new FormData(formRef.current);
-
-  useEffect(() => {
-    formData = new FormData(formRef.current);
-  }, []);
 
   // send "formData" object to web server for playlist creation and song addition
   async function sendPlaylistData(e) {
-    // NOTE: create formData here?
     // NOTE: "props.playlistFormData" -> two-way data binding (apparently) does not work with files! Alternative?
     try {
       e.preventDefault();
-      const response = await fetch(url, {
+      const formData = new FormData(e.target);
+      const formUrl = `${serverRoot}/playlists/create-playlist`;
+      const response = await fetch(formUrl, {
         method: "post",
         credentials: "include",
         body: formData,
@@ -25,11 +19,12 @@ export default function Form(props) {
       const result = await response.json();
       if (result.valErrors) {
         setValidationResult(() => {
-          return result.valErrors.map((v, i) => {
-            return <div key={i}>{v.msg}</div>;
+          return result.valErrors.map((v) => {
+            return <div key={v.msg}>{v.msg}</div>;
           });
         });
       } else {
+        setValidationResult("");
         props.setUploadId(crypto.randomUUID());
         props.changeStatusMessage(result.success);
       }
@@ -38,25 +33,23 @@ export default function Form(props) {
     }
   }
 
-  // update global playlist data and "formData" content
-  function updateFormData(name, value) {
-    props.setPlaylistFormData({ ...props.playlistFormData, [name]: value });
-    formData.append(name, value);
-  }
-
   return (
     <>
       <form
         onSubmit={(e) => {
           sendPlaylistData(e);
         }}
-        ref={formRef}
         encType="multipart/form-data"
       >
         <div>
           <label htmlFor="playlist">Type in a playlist name: </label>
           <input
-            onChange={(e) => updateFormData(e.target.name, e.target.value)}
+            onChange={(e) =>
+              props.setPlaylistFormData({
+                ...props.playlistFormData,
+                [e.target.name]: e.target.value,
+              })
+            }
             type="text"
             id="playlist"
             name="playlist"
@@ -70,7 +63,12 @@ export default function Form(props) {
         <div>
           <label htmlFor="image">Add an image file: </label>
           <input
-            onChange={(e) => updateFormData(e.target.name, e.target.value)}
+            onChange={(e) => {
+              props.setPlaylistFormData({
+                ...props.playlistFormData,
+                [e.target.name]: e.target.value,
+              });
+            }}
             type="file"
             id="image"
             name="image"
@@ -81,9 +79,12 @@ export default function Form(props) {
           />
           <input type="button" value="&#x21c4;" disabled={props.formDisabled} />
           <input
-            onClick={() => {
-              updateFormData("image", "");
-            }}
+            onClick={() =>
+              props.setPlaylistFormData({
+                ...props.playlistFormData,
+                image: "",
+              })
+            }
             type="button"
             value="X"
             disabled={props.formDisabled}
@@ -93,7 +94,12 @@ export default function Form(props) {
         <div>
           <label htmlFor="audio">Add an audio file: </label>
           <input
-            onChange={(e) => updateFormData(e.target.name, e.target.value)}
+            onChange={(e) =>
+              props.setPlaylistFormData({
+                ...props.playlistFormData,
+                [e.target.name]: e.target.value,
+              })
+            }
             type="file"
             id="audio"
             name="audio"
@@ -103,9 +109,12 @@ export default function Form(props) {
             disabled={props.formDisabled}
           />
           <input
-            onClick={() => {
-              updateFormData("audio", "");
-            }}
+            onClick={() =>
+              props.setPlaylistFormData({
+                ...props.playlistFormData,
+                audio: "",
+              })
+            }
             type="button"
             value="X"
             disabled={props.formDisabled}
@@ -115,7 +124,12 @@ export default function Form(props) {
         <div>
           <label htmlFor="song">Type in a song name: </label>
           <input
-            onChange={(e) => updateFormData(e.target.name, e.target.value)}
+            onChange={(e) =>
+              props.setPlaylistFormData({
+                ...props.playlistFormData,
+                [e.target.name]: e.target.value,
+              })
+            }
             type="text"
             id="song"
             name="song"
@@ -129,7 +143,12 @@ export default function Form(props) {
         <div>
           <label htmlFor="artist">Type in an artist name: </label>
           <input
-            onChange={(e) => updateFormData(e.target.name, e.target.value)}
+            onChange={(e) =>
+              props.setPlaylistFormData({
+                ...props.playlistFormData,
+                [e.target.name]: e.target.value,
+              })
+            }
             type="text"
             id="artist"
             name="artist"
@@ -143,7 +162,12 @@ export default function Form(props) {
         <div>
           <label htmlFor="genre">Type in a genre name: </label>
           <input
-            onChange={(e) => updateFormData(e.target.name, e.target.value)}
+            onChange={(e) =>
+              props.setPlaylistFormData({
+                ...props.playlistFormData,
+                [e.target.name]: e.target.value,
+              })
+            }
             type="text"
             id="genre"
             name="genre"

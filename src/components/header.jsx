@@ -6,26 +6,21 @@ export default function Header(props) {
   );
   const selectionVal = useRef("");
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
-  const namesUrl = `${serverRoot}/playlists/get-playlistnames`;
-  const playlistUrl = `${serverRoot}/playlists/get-playlist`;
-  const formData = new FormData();
 
   useEffect(() => {
     getPlaylistNames();
-    return () => {
-      props.setPlaylistData("");
-    };
   }, [props.username, props.uploadId]);
 
   // fetch playlist names to be displayed as options in the playlist dropdown menu
   async function getPlaylistNames() {
     try {
+      const namesUrl = `${serverRoot}/playlists/get-playlistnames`;
       const response = await fetch(namesUrl, { credentials: "include" });
       const result = await response.json();
       if (result.success) {
         setPlaylistOptions(
-          result.playlistNames.map((v, i) => {
-            return <option key={i}>{v.playlist}</option>;
+          result.playlistNames.map((v) => {
+            return <option key={v.playlist}>{v.playlist}</option>;
           })
         );
         selectPlaylist(
@@ -36,6 +31,7 @@ export default function Header(props) {
         );
       } else {
         setPlaylistOptions(<option>Default</option>);
+        props.setPlaylistData("");
         props.changeStatusMessage(result.error);
       }
     } catch (err) {
@@ -53,18 +49,20 @@ export default function Header(props) {
   // fetch playlist songs from the playlist dropdown menu
   async function fetchPlaylist(playlistData) {
     try {
+      const formData = new FormData();
       formData.set("playlist", playlistData);
-      const result = await fetch(playlistUrl, {
+      const playlistUrl = `${serverRoot}/playlists/get-playlist`;
+      const response = await fetch(playlistUrl, {
         method: "POST",
         credentials: "include",
         body: formData,
       });
-      const response = await result.json();
-      if (response.playlist) {
-        props.setPlaylistData(response.playlist);
+      const result = await response.json();
+      if (result.playlist) {
+        props.setPlaylistData(result.playlist);
         props.changeStatusMessage(`Playlist ${playlistData} selected!`);
       } else {
-        props.changeStatusMessage(response.error);
+        props.changeStatusMessage(result.error);
       }
     } catch (err) {
       props.changeStatusMessage(err.message);
