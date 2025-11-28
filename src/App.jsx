@@ -16,10 +16,10 @@ import "./App.css";
 
 export default function App() {
   // variable groups (grouped according to where variables are (mainly) used)
-  // APP
+  // *APP*
   const [cookies, setCookie, removeCookie] = useCookies(["userToken"]); // -> create a cookie in order to store a web token that will be sent with various requests to protected routes (e.g. granting access to the user's playlists etc.)
   const [screenSize, getScreenSize] = useState(window.innerWidth); // -> pass variable to "setBody" function (information) and setter to "window.onresize" function
-  // HEADER
+  // *HEADER*
   const [viewButton, setViewButton] = useState(chevronRight); // -> pass variable to HEADER (display) and "toggleView"/"setBody" functions (information) and setter to "toggleView", "changeMenuContent", "loginUser" and "logoutUser" functions
   const [popupImage, setPopupImage] = useState(menu); // -> pass variable to HEADER (display) and "togglePopupMenu" function (information) and setter to "togglePopupMenu", "loginUser" and "logoutUser" functions
   const [popupList, setPopupList] = useState(<></>); // -> pass variable to HEADER (display) and setter to "togglePopupMenu", "loginUser" and "logoutUser" functions
@@ -33,8 +33,8 @@ export default function App() {
       ? "Logout"
       : "Login"
   ); // -> pass variable to "popupJSX" (HEADER) component (display) and setter to "loginUser" and "logoutUser" functions
-  const [uploadId, setUploadId] = useState(0); // -> pass variable to HEADER (information) and setter function to FORM
-  // BODY (-> FORM, MENU, PLAYLIST)
+  const [uploadId, setUploadId] = useState(0); // -> pass variable to HEADER (information) and setter function to FORM, PLAYLIST and SONG
+  // *BODY* (-> FORM, MENU, PLAYLIST)
   const [formDisabled, setFormDisabled] = useState(
     cookies.userToken && localStorage.getItem("currentUser") ? false : true
   ); // -> pass variable to FORM (information) and setter to "loginUser" and "logoutUser" functions
@@ -65,7 +65,7 @@ export default function App() {
   const [displayPWButton, setDisplayPWButton] = useState(false); // -> pass variable to MENU (information) and setter to the same component
   const [playlistData, setPlaylistData] = useState([]); // -> pass variable to PLAYLIST (information) and setter to HEADER
   const [playlistMode, setPlaylistMode] = useState(list); // -> pass variable to PLAYLIST (information), FOOTER (display) and "togglePlaylistMode" function (information) and setter to the same function
-  // FOOTER
+  // *FOOTER*
   const [statusMessage, setStatusMessage] = useState([]); // -> pass variable to FOOTER (display) and to "changeStatusMessage" function (information) and setter to the same function
 
   // create JSX container for use in the "togglePopupMenu" function
@@ -104,7 +104,12 @@ export default function App() {
     />
   );
   const playlistJSX = (
-    <Playlist playlistData={playlistData} playlistMode={playlistMode} />
+    <Playlist
+      playlistData={playlistData}
+      playlistMode={playlistMode}
+      setUploadId={setUploadId}
+      changeStatusMessage={changeStatusMessage} // preliminary; may later be passed to this compoment and SONG via Context
+    />
   );
 
   // get viewport width for responsive adjustment of BODY components

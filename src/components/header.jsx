@@ -4,7 +4,7 @@ export default function Header(props) {
   const [playlistOptions, setPlaylistOptions] = useState(
     <option>Default</option>
   );
-  const selectionVal = useRef("");
+  const selectionVal = useRef("Default");
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
   useEffect(() => {
@@ -25,7 +25,9 @@ export default function Header(props) {
         );
         selectPlaylist(
           null,
-          !(playlistOptions instanceof Array)
+          result.playlistNames.every(
+            (v) => v.playlist.indexOf(selectionVal.current) === -1
+          )
             ? result.playlistNames[0].playlist
             : selectionVal.current
         );
@@ -42,8 +44,7 @@ export default function Header(props) {
   // change selected playlist
   function selectPlaylist(e, initialValue) {
     selectionVal.current = e ? e.target.value : initialValue;
-    const valueParam = e ? e.target.value : initialValue;
-    fetchPlaylist(valueParam);
+    fetchPlaylist(selectionVal.current);
   }
 
   // fetch playlist songs from the playlist dropdown menu
@@ -60,7 +61,7 @@ export default function Header(props) {
       const result = await response.json();
       if (result.playlist) {
         props.setPlaylistData(result.playlist);
-        props.changeStatusMessage(`Playlist ${playlistData} selected!`);
+        props.changeStatusMessage(`Playlist '${playlistData}' selected!`);
       } else {
         props.changeStatusMessage(result.error);
       }

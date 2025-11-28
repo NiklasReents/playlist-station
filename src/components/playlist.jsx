@@ -14,6 +14,8 @@ export default function Playlist(props) {
             song={v.song}
             artist={v.artist}
             genre={v.genre}
+            setUploadId={props.setUploadId}
+            changeStatusMessage={props.changeStatusMessage}
           />
         );
       })
