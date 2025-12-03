@@ -25,19 +25,29 @@ export default function Song(props) {
 
   return (
     <li>
-      <div className="song-image">
-        <img src={serverRoot + props.image} alt="Image" />
-      </div>
-      <div className="song-audio">
-        <audio controls>
-          <source src={serverRoot + props.audio} />
-        </audio>
-      </div>
+      {props.isActive ? (
+        <div className="song-data-container">
+          <div className="song-image">
+            <img src={serverRoot + props.image} alt="Image" />
+          </div>
+          <div className="song-audio">
+            <audio
+              onLoadedData={(e) => e.currentTarget.play()}
+              onEnded={props.handleSongChange}
+              controls
+            >
+              <source src={serverRoot + props.audio} />
+            </audio>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className="song-info">
         <span>{props.song}</span> <span>{props.artist}</span>{" "}
         <span>{props.genre}</span>{" "}
-        <button onClick={deleteSong}>Delete Song</button>
       </div>
+      <button onClick={deleteSong}>Delete Song</button>
     </li>
   );
 }
