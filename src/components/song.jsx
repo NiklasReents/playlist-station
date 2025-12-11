@@ -1,5 +1,22 @@
+import { useRef, useEffect } from "react";
+
 export default function Song(props) {
+  const songRef = useRef(null);
+  const songAudioRef = useRef(null);
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
+
+  useEffect(handleVolumeChange, [props.isActive, props.songVolume]);
+
+  // keep the same song volume level across song and playlist changes
+  function handleVolumeChange() {
+    if (songAudioRef.current) {
+      if (typeof props.songVolume === "number") {
+        songAudioRef.current.volume = props.songVolume;
+      } else {
+        songAudioRef.current.muted = true;
+      }
+    }
+  }
 
   // delete a single song from the currently selected playlist
   async function deleteSong() {
@@ -24,8 +41,8 @@ export default function Song(props) {
   }
 
   return (
-    <li>
-      {props.isActive ? (
+    <li ref={songRef} className="song">
+      {props.isActive && (
         <div className="song-data-container">
           <div className="song-image">
             <img src={serverRoot + props.image} alt="Image" />
@@ -33,21 +50,26 @@ export default function Song(props) {
           <div className="song-audio">
             <audio
               onLoadedData={(e) => e.currentTarget.play()}
-              onEnded={props.handleSongChange}
+              onEnded={() => props.handleSongChange(songRef.current)}
+              onVolumeChange={(e) =>
+                props.setSongVolume(
+                  !e.target.muted ? e.target.volume : e.target.muted
+                )
+              }
+              ref={songAudioRef}
               controls
             >
               <source src={serverRoot + props.audio} />
             </audio>
           </div>
         </div>
-      ) : (
-        <></>
       )}
       <div className="song-info">
-        <span>{props.song}</span> <span>{props.artist}</span>{" "}
-        <span>{props.genre}</span>{" "}
+        {props.song} {props.artist} {props.genre}
       </div>
-      <button onClick={deleteSong}>Delete Song</button>
+      {!props.playlistProgress && (
+        <button onClick={deleteSong}>Delete Song</button>
+      )}
     </li>
   );
 }

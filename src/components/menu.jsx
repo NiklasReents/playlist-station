@@ -5,12 +5,14 @@ export default function Menu(props) {
   const [forgotPWMail, setForgotPWMail] = useState("");
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
-  useEffect(() => {
+  useEffect(keepForgotPWButton, [props.menuContent]);
+
+  // keep the "Forgot Password" button with the correct email if the associated username remains in the username input of the login form between renders
+  function keepForgotPWButton() {
     if (props.menuContent === "Login" && props.displayPWButton) {
-      // keep the "Forgot Password" button with the correct email if an associated username remains in the username input of the login form between renders; may be subject to change
-      renderForgotPWButton(null, props.loginData.username);
+      renderForgotPWButton(props.loginData.username);
     }
-  }, [props.menuContent]);
+  }
 
   // send "formData" object to web server for user registration and login
   async function sendUserData(e) {
@@ -18,9 +20,8 @@ export default function Menu(props) {
       e.preventDefault();
       const formData = new FormData(e.target);
       const userURL =
-        props.menuContent !== "Settings"
-          ? `${serverRoot}/users/${props.menuContent.toLowerCase()}-user`
-          : "";
+        props.menuContent !== "Settings" &&
+        `${serverRoot}/users/${props.menuContent.toLowerCase()}-user`;
       const response = await fetch(userURL, {
         method: "POST",
         body: formData,
@@ -58,9 +59,9 @@ export default function Menu(props) {
   }
 
   // display the "Forgot Password" button in the login form if a valid user name is entered into the username input
-  async function renderForgotPWButton(e, username) {
+  async function renderForgotPWButton(username) {
     try {
-      const emailParam = e ? e.target.value : username;
+      const emailParam = username;
       const mailUrl = `${serverRoot}/users/forgot-password?user=${emailParam}`;
       const response = await fetch(mailUrl);
       const result = await response.json();
@@ -152,7 +153,7 @@ export default function Menu(props) {
             <label htmlFor="username">Username: </label>
             <input
               onChange={(e) => {
-                renderForgotPWButton(e, null);
+                renderForgotPWButton(e.target.value);
                 props.setLoginData({
                   ...props.loginData,
                   [e.target.name]: e.target.value,
@@ -224,7 +225,7 @@ export default function Menu(props) {
             />
             <br />
             {/*
-              experimental language setting option that may be dropped from the final version of the app 
+              NOTE: experimental language setting option that may be dropped from the final version of the app 
             */}
             <label htmlFor="language">Change user language: </label>
             <select

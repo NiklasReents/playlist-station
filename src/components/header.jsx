@@ -7,6 +7,7 @@ export default function Header(props) {
   const selectionVal = useRef("Default");
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
+  // fetch latest playlist data after first render (if the user is already logged in) and everytime a user logs in or a playlist/song gets uploaded
   useEffect(() => {
     getPlaylistNames();
   }, [props.username, props.uploadId]);
@@ -24,7 +25,6 @@ export default function Header(props) {
           })
         );
         selectPlaylist(
-          null,
           result.playlistNames.every(
             (v) => v.playlist.indexOf(selectionVal.current) === -1
           )
@@ -32,6 +32,7 @@ export default function Header(props) {
             : selectionVal.current
         );
       } else {
+        selectionVal.current = "Default";
         setPlaylistOptions(<option>Default</option>);
         props.setPlaylistData("");
         props.changeStatusMessage(result.error);
@@ -42,8 +43,8 @@ export default function Header(props) {
   }
 
   // change selected playlist
-  function selectPlaylist(e, initialValue) {
-    selectionVal.current = e ? e.target.value : initialValue;
+  function selectPlaylist(playlistName) {
+    selectionVal.current = playlistName;
     fetchPlaylist(selectionVal.current);
   }
 
@@ -77,7 +78,7 @@ export default function Header(props) {
       </div>
       <div>
         <div>Welcome, {props.username}</div>
-        <select onChange={(e) => selectPlaylist(e, null)}>
+        <select onChange={(e) => selectPlaylist(e.target.value)}>
           {playlistOptions}
         </select>
       </div>

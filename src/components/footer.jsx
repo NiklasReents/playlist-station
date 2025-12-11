@@ -28,9 +28,9 @@ export default function Footer(props) {
   return (
     <footer>
       <div>
-        {cookies.userToken && localStorage.getItem("currentUser") ? (
+        {cookies.userToken && localStorage.getItem("currentUser") && (
           <button onClick={deleteUser}>Delete User</button>
-        ) : null}
+        )}
       </div>
       <div>
         <div>Create A Playlist!</div>
