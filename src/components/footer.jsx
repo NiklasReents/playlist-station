@@ -11,7 +11,7 @@ export default function Footer(props) {
       formData.set("username", localStorage.getItem("currentUser"));
       const deletionUrl = `${serverRoot}/users/delete-user`;
       const response = await fetch(deletionUrl, {
-        method: "DELETE",
+        method: "delete",
         body: formData,
       });
       const result = await response.json();
@@ -26,17 +26,17 @@ export default function Footer(props) {
   }
 
   return (
-    <footer>
-      <div>
+    <footer className="footer">
+      <div className="footer-delete-user">
         {cookies.userToken && localStorage.getItem("currentUser") && (
           <button onClick={deleteUser}>Delete User</button>
         )}
       </div>
-      <div>
+      <div className="footer-statusbar">
         <div>Create A Playlist!</div>
         <div>{props.statusMessage}</div>
       </div>
-      <div>
+      <div className="footer-playlistmode">
         <img
           onClick={props.togglePlaylistMode}
           src={props.playlistMode}

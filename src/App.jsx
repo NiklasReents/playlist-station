@@ -33,7 +33,7 @@ export default function App() {
       ? "Logout"
       : "Login"
   ); // -> pass variable to "popupJSX" (HEADER) component (display) and setter to "loginUser" and "logoutUser" functions
-  const [uploadId, setUploadId] = useState(0); // -> pass variable to HEADER (information) and setter function to FORM, PLAYLIST and SONG
+  const [actionId, setActionId] = useState(0); // -> pass variable to HEADER (information) and setter function to FORM, PLAYLIST and SONG
   // *BODY* (-> FORM, MENU, PLAYLIST)
   const [formDisabled, setFormDisabled] = useState(
     cookies.userToken && localStorage.getItem("currentUser") ? false : true
@@ -70,7 +70,7 @@ export default function App() {
 
   // create JSX container for use in the "togglePopupMenu" function
   const popupJSX = (
-    <div onClick={(e) => changeMenuContent(e)}>
+    <div onClick={(e) => changeMenuContent(e)} className="popup-menu">
       <button>Register</button>
       <button>{loginButton}</button>
       <button>Settings</button>
@@ -82,7 +82,7 @@ export default function App() {
       formDisabled={formDisabled}
       playlistFormData={playlistFormData}
       setPlaylistFormData={setPlaylistFormData}
-      setUploadId={setUploadId}
+      setActionId={setActionId}
       changeStatusMessage={changeStatusMessage}
     />
   );
@@ -105,9 +105,10 @@ export default function App() {
   );
   const playlistJSX = (
     <Playlist
+      key="playlistjsx"
       playlistData={playlistData}
       playlistMode={playlistMode}
-      setUploadId={setUploadId}
+      setActionId={setActionId}
       changeStatusMessage={changeStatusMessage} // preliminary; may later be passed to this compoment and SONG via Context
     />
   );
@@ -150,11 +151,13 @@ export default function App() {
   change the chevron image to an "X" (close) with which the MENU can be closed
   */
   function changeMenuContent(e) {
-    if (e.target.textContent === "Logout") {
-      logoutUser(`${username} successfully logged out!`);
-    } else {
-      setMenuContent(e.target.textContent);
-      setViewButton(close);
+    if (e.target.tagName === "BUTTON") {
+      if (e.target.textContent === "Logout") {
+        logoutUser(`${username} successfully logged out!`);
+      } else if (e.target.textContent !== "Logout") {
+        setMenuContent(e.target.textContent);
+        setViewButton(close);
+      }
     }
   }
 
@@ -225,7 +228,7 @@ export default function App() {
   // set the content of the BODY component depending on viewport width and certain user interactions
   function setBody() {
     if (viewButton === chevronRight) {
-      return screenSize <= 1000 ? (
+      return screenSize <= 1200 ? (
         formJSX
       ) : (
         <>
@@ -234,7 +237,7 @@ export default function App() {
         </>
       );
     } else if (viewButton === chevronLeft) {
-      return screenSize <= 1000 ? (
+      return screenSize <= 1200 ? (
         playlistJSX
       ) : (
         <>
@@ -254,7 +257,7 @@ export default function App() {
         popupImage={popupImage}
         popupList={popupList}
         username={username}
-        uploadId={uploadId}
+        actionId={actionId}
         changeStatusMessage={changeStatusMessage}
         setPlaylistData={setPlaylistData}
         toggleView={toggleView}

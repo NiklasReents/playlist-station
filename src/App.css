@@ -1,42 +1,397 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/*elements*/
+
+html {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  font-size: 1.2em;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  width: 75%;
+}
+
+/*classes*/
+
+.header {
+  border-top-left-radius: 25%;
+  border-top-right-radius: 25%;
+}
+
+.header-toggleimage {
+  text-align: left;
+}
+
+.header-selection-container {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.header-selection-container > :last-child {
+  width: 50%;
+  padding: 5px;
+  margin-top: 5px;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  text-align: center;
+  background: linear-gradient(
+    to left,
+    rgb(120, 120, 120),
+    rgb(170, 170, 170),
+    rgb(192, 192, 192)
+  );
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.header > :not(.header-selection-container) {
+  height: 50%;
+  width: 25%;
+  cursor: pointer;
+}
+
+.header-menu-container {
+  text-align: right;
+}
+
+.header img {
+  height: 100%;
+}
+
+.header,
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 5vh;
+  padding: 2%;
+  box-shadow: 0px 15px 25px black;
+  background: radial-gradient(circle, rgb(255 255 0), rgb(255 128 0));
+}
+
+.popup-menu {
+  position: absolute;
+  padding: 25px;
+  right: 14%;
+  border: 2px dotted rgb(120, 120, 120);
+  border-radius: 5px;
+  background: linear-gradient(
+    to left,
+    rgb(120, 120, 120),
+    rgb(170, 170, 170),
+    rgb(192, 192, 192)
+  );
+}
+
+.popup-menu > button {
+  margin: 2px;
+  font-size: 1.1rem;
+  box-shadow: 0px 5px 25px black;
+}
+
+.body {
+  display: flex;
+  justify-content: space-around;
+  height: 50vh;
+  padding: 2%;
+  background: rgb(192, 192, 192);
+}
+
+.form,
+.menu-form {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  padding: 3px;
+  overflow: auto;
+  font-size: inherit;
+  font-family: inherit;
+  border-radius: 10px;
+  box-shadow: 0px 10px 25px black;
+  background: radial-gradient(circle, rgb(255 255 0), rgb(255 128 0));
+}
+
+.form > div,
+.menu-form div {
+  max-height: 12%;
+  display: flex;
+  justify-content: space-between;
+  margin: 2px;
+  padding: 2%;
+  background: rgb(255, 255, 255);
+}
+
+.form > div {
+  margin: 5px;
+}
+
+.form label {
+  max-height: 12%;
+  width: 30%;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.form input:not(input[type="button"], input[type="submit"]),
+.menu-form input,
+.menu-form select,
+.menu-form option {
+  width: 70%;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.form input[type="button"] {
+  max-height: 100%;
+  max-width: 10%;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.form input[type="submit"],
+.menu input[type="submit"] {
+  width: 30%;
+  align-self: center;
+  padding: 3px;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.menu {
+  width: 100%;
+  padding: 2%;
+  overflow: auto;
+  border-radius: 25px;
+  background: radial-gradient(
+    circle,
+    rgb(50, 50, 50),
+    rgb(170, 170, 170),
+    rgb(192, 192, 192)
+  );
+}
+
+.menu-body {
+  height: 75%;
+  display: flex;
+  margin-right: 5px;
+}
+
+.menu-form {
+  width: 70%;
+  margin: 0 auto;
+}
+
+.menu-login input[name="forgot-password"] {
+  width: 50%;
+  margin: 0 auto;
+}
+
+.menu-validation-results {
+  width: 30%;
+  padding: 10px;
+  margin-left: 5px;
+  border-radius: 25px;
+  background: rgb(255, 255, 255);
+}
+
+.menu-validation-results div {
+  margin: 2px;
+}
+
+.playlist {
+  height: 100%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: rgb(169, 169, 169);
+}
+
+.playlist-info {
+  height: 10%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin: 10px;
+}
+
+.playlist-info > * {
+  height: 100%;
+  width: 15%;
+  align-content: center;
+  text-align: center;
+}
+
+.playlist-delete,
+.playlist-progress {
+  align-self: flex-start;
+}
+
+.playlist-start {
+  align-self: center;
+  position: absolute;
+  cursor: pointer;
+  font-size: 2rem;
+}
+
+.playlist-start:hover {
+  color: rgb(255 128 0);
+}
+
+.playlist-songs {
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  padding-left: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.song {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5px;
+  padding: 10px;
+  border: 2px dotted rgb(120, 120, 120);
+  border-radius: 5px;
+  box-shadow: 0px 5px 25px black;
+  background: linear-gradient(
+    to left,
+    rgb(120, 120, 120),
+    rgb(170, 170, 170),
+    rgb(192, 192, 192)
+  );
+}
+
+.song:hover {
+  background: rgb(192, 192, 192);
+}
+
+.song > * {
+  margin: 7px;
+}
+
+.song-data-container {
+  max-height: 500px;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.song-image > img {
+  height: 250px;
+  width: 250px;
+  margin-top: 10px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.song-info {
+  cursor: pointer;
+}
+
+.song-info:hover {
+  color: rgb(255 128 0);
+}
+
+.song-delete {
+  font-size: 1.1em;
+}
+
+.footer {
+  border-bottom-left-radius: 25%;
+  border-bottom-right-radius: 25%;
+}
+
+.footer > :not(.footer-statusbar) {
+  height: 50%;
+  width: 25%;
+}
+
+footer > :first-child {
+  text-align: left;
+}
+
+.footer-statusbar {
+  height: 50%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  text-align: center;
+}
+
+.footer-statusbar > :last-child {
+  min-width: 70%;
+  position: absolute;
+  top: 100%;
+  overflow: auto;
+  border-radius: 5px;
+  box-shadow: 0px 5px 25px black;
+  background-color: rgb(192, 192, 192);
+}
+
+.footer-statusbar > :last-child > p {
+  padding: 5px;
+  margin: 5px;
+  border: 2px dotted rgb(120, 120, 120);
+}
+
+.footer > :last-child {
+  cursor: pointer;
+  text-align: right;
+}
+
+.footer button,
+.footer img {
+  height: 100%;
+}
+
+@media (max-width: 1200px) {
+  .playlist,
+  .form {
+    width: 100%;
   }
-  to {
-    transform: rotate(360deg);
+
+  .menu-body {
+    display: flex;
+    flex-direction: column;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .menu-body > * {
+    width: 100%;
+    margin: 5px;
   }
-}
 
-.card {
-  padding: 2em;
-}
+  .popup-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    padding: 15px;
+    right: 14%;
+    border: 2px dotted rgb(120, 120, 120);
+    background: linear-gradient(
+      to left,
+      rgb(120, 120, 120),
+      rgb(170, 170, 170),
+      rgb(192, 192, 192)
+    );
+  }
 
-.read-the-docs {
-  color: #888;
+  .popup-menu > button {
+    margin: 2px;
+    font-size: 0.7em;
+    box-shadow: 0px 5px 25px black;
+  }
 }

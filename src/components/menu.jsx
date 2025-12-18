@@ -90,170 +90,194 @@ export default function Menu(props) {
   }
 
   return (
-    <>
-      <h1>{props.menuContent}</h1>
-      <form
-        onSubmit={(e) => {
-          sendUserData(e);
-        }}
-      >
-        {props.menuContent === "Register" ? (
-          <>
-            <label htmlFor="username">Username: </label>
-            <input
-              onChange={(e) => {
-                props.setRegisterData({
-                  ...props.registerData,
-                  [e.target.name]: e.target.value,
-                });
-              }}
-              type="text"
-              id="username"
-              name="username"
-              placeholder="type in a username..."
-              value={props.registerData.username}
-              required
-            />
-            <br />
-            <label htmlFor="email">Email: </label>
-            <input
-              onChange={(e) => {
-                props.setRegisterData({
-                  ...props.registerData,
-                  [e.target.name]: e.target.value,
-                });
-              }}
-              type="email"
-              id="email"
-              name="email"
-              placeholder="type in an email..."
-              value={props.registerData.email}
-              required
-            />
-            <br />
-            <label htmlFor="password">Password: </label>
-            <input
-              onChange={(e) => {
-                props.setRegisterData({
-                  ...props.registerData,
-                  [e.target.name]: e.target.value,
-                });
-              }}
-              type="password"
-              id="password"
-              name="password"
-              placeholder="type in a password..."
-              value={props.registerData.password}
-              required
-            />
-            <br />
-          </>
-        ) : props.menuContent === "Login" ? (
-          <>
-            <label htmlFor="username">Username: </label>
-            <input
-              onChange={(e) => {
-                renderForgotPWButton(e.target.value);
-                props.setLoginData({
-                  ...props.loginData,
-                  [e.target.name]: e.target.value,
-                });
-              }}
-              type="text"
-              id="username"
-              name="username"
-              placeholder="type in a username..."
-              value={props.loginData.username}
-              required
-            />
-            <br />
-            <label htmlFor="password">Password: </label>
-            <input
-              onChange={(e) => {
-                props.setLoginData({
-                  ...props.loginData,
-                  [e.target.name]: e.target.value,
-                });
-              }}
-              type="password"
-              id="password"
-              name="password"
-              placeholder="type in a password..."
-              value={props.loginData.password}
-              required
-            />
-            <br />
-            {props.displayPWButton ? (
-              <input
-                onClick={sendForgotPWMail}
-                type="button"
-                value="Forgot Password"
-              />
-            ) : (
-              ""
-            )}
-            <br />
-          </>
-        ) : (
-          <>
-            <label htmlFor="color-primary">Change main color: </label>
-            <input
-              onChange={(e) =>
-                props.setSettingsData({
-                  ...props.settingsData,
-                  colorPrimary: e.target.value,
-                })
-              }
-              type="color"
-              id="color-primary"
-              name="color-primary"
-              value={props.settingsData.colorPrimary}
-            />
-            <br />
-            <label htmlFor="color-secondary">Change secondary color: </label>
-            <input
-              onChange={(e) =>
-                props.setSettingsData({
-                  ...props.settingsData,
-                  colorSecondary: e.target.value,
-                })
-              }
-              type="color"
-              id="color-secondary"
-              name="color-secondary"
-              value={props.settingsData.colorSecondary}
-            />
-            <br />
-            {/*
+    <section className="menu">
+      <h1 className="menu-caption">{props.menuContent}</h1>
+      <section className="menu-body">
+        <form
+          onSubmit={(e) => {
+            sendUserData(e);
+          }}
+          className="menu-form"
+        >
+          {props.menuContent === "Register" ? (
+            <section className="menu-register">
+              <div>
+                <label htmlFor="username">Username: </label>
+                <input
+                  onChange={(e) => {
+                    props.setRegisterData({
+                      ...props.registerData,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                  type="text"
+                  id="username"
+                  name="username"
+                  placeholder="type in a username..."
+                  value={props.registerData.username}
+                  required
+                />
+              </div>
+              <br />
+              <div>
+                <label htmlFor="email">Email: </label>
+                <input
+                  onChange={(e) => {
+                    props.setRegisterData({
+                      ...props.registerData,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="type in an email..."
+                  value={props.registerData.email}
+                  required
+                />
+              </div>
+              <br />
+              <div>
+                <label htmlFor="password">Password: </label>
+                <input
+                  onChange={(e) => {
+                    props.setRegisterData({
+                      ...props.registerData,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="type in a password..."
+                  value={props.registerData.password}
+                  required
+                />
+              </div>
+              <br />
+            </section>
+          ) : props.menuContent === "Login" ? (
+            <section className="menu-login">
+              <div>
+                <label htmlFor="username">Username: </label>
+                <input
+                  onChange={(e) => {
+                    renderForgotPWButton(e.target.value);
+                    props.setLoginData({
+                      ...props.loginData,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                  type="text"
+                  id="username"
+                  name="username"
+                  placeholder="type in a username..."
+                  value={props.loginData.username}
+                  required
+                />
+              </div>
+              <br />
+              <div>
+                <label htmlFor="password">Password: </label>
+                <input
+                  onChange={(e) => {
+                    props.setLoginData({
+                      ...props.loginData,
+                      [e.target.name]: e.target.value,
+                    });
+                  }}
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="type in a password..."
+                  value={props.loginData.password}
+                  required
+                />
+              </div>
+              <br />
+              {props.displayPWButton && (
+                <>
+                  <div>
+                    <input
+                      onClick={sendForgotPWMail}
+                      type="button"
+                      name="forgot-password"
+                      value="Forgot Password"
+                    />
+                  </div>
+                  <br />
+                </>
+              )}
+            </section>
+          ) : (
+            <section className="menu-settings">
+              <div>
+                <label htmlFor="color-primary">Change main color: </label>
+                <input
+                  onChange={(e) =>
+                    props.setSettingsData({
+                      ...props.settingsData,
+                      colorPrimary: e.target.value,
+                    })
+                  }
+                  type="color"
+                  id="color-primary"
+                  name="color-primary"
+                  value={props.settingsData.colorPrimary}
+                />
+              </div>
+              <br />
+              <div>
+                <label htmlFor="color-secondary">
+                  Change secondary color:{" "}
+                </label>
+                <input
+                  onChange={(e) =>
+                    props.setSettingsData({
+                      ...props.settingsData,
+                      colorSecondary: e.target.value,
+                    })
+                  }
+                  type="color"
+                  id="color-secondary"
+                  name="color-secondary"
+                  value={props.settingsData.colorSecondary}
+                />
+              </div>
+              <br />
+              {/*
               NOTE: experimental language setting option that may be dropped from the final version of the app 
             */}
-            <label htmlFor="language">Change user language: </label>
-            <select
-              onChange={(e) =>
-                props.setSettingsData({
-                  ...props.settingsData,
-                  appLanguage: e.target.value,
-                })
-              }
-              id="language"
-              value={props.settingsData.appLanguage}
-            >
-              <option value="english">English</option>
-              <option value="german">German</option>
-            </select>
-            <br />
-          </>
-        )}
-        {props.menuContent !== "Settings" ? (
-          <input type="submit" value="Send Data" />
-        ) : (
-          <></>
-        )}
-      </form>
-      {/*
+              <div>
+                <label htmlFor="language">Change user language: </label>
+                <select
+                  onChange={(e) =>
+                    props.setSettingsData({
+                      ...props.settingsData,
+                      appLanguage: e.target.value,
+                    })
+                  }
+                  id="language"
+                  value={props.settingsData.appLanguage}
+                >
+                  <option value="english">English</option>
+                  <option value="german">German</option>
+                </select>
+              </div>
+              <br />
+            </section>
+          )}
+          {props.menuContent !== "Settings" && (
+            <input type="submit" value="Send Data" />
+          )}
+        </form>
+        {/*
         display validation error messages
       */}
-      {validationResult}
-    </>
+        {validationResult && (
+          <div className="menu-validation-results">{validationResult}</div>
+        )}
+      </section>
+    </section>
   );
 }

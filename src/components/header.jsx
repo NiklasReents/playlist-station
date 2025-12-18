@@ -10,7 +10,7 @@ export default function Header(props) {
   // fetch latest playlist data after first render (if the user is already logged in) and everytime a user logs in or a playlist/song gets uploaded
   useEffect(() => {
     getPlaylistNames();
-  }, [props.username, props.uploadId]);
+  }, [props.username, props.actionId]);
 
   // fetch playlist names to be displayed as options in the playlist dropdown menu
   async function getPlaylistNames() {
@@ -72,17 +72,17 @@ export default function Header(props) {
   }
 
   return (
-    <header>
-      <div>
+    <header className="header">
+      <div className="header-toggleimage">
         <img onClick={props.toggleView} src={props.viewButton} alt="chevron" />
       </div>
-      <div>
+      <div className="header-selection-container">
         <div>Welcome, {props.username}</div>
         <select onChange={(e) => selectPlaylist(e.target.value)}>
           {playlistOptions}
         </select>
       </div>
-      <div>
+      <div className="header-menu-container">
         <img
           onClick={props.togglePopupMenu}
           src={props.popupImage}

@@ -5,8 +5,8 @@ export default function Form(props) {
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
   // send "formData" object to web server for playlist creation and song addition
+  // NOTE: "props.playlistFormData" -> two-way data binding (apparently) does not work with files! Alternative?
   async function sendPlaylistData(e) {
-    // NOTE: "props.playlistFormData" -> two-way data binding (apparently) does not work with files! Alternative?
     try {
       e.preventDefault();
       const formData = new FormData(e.target);
@@ -25,7 +25,7 @@ export default function Form(props) {
         });
       } else {
         setValidationResult("");
-        props.setUploadId(crypto.randomUUID());
+        props.setActionId(crypto.randomUUID());
         props.changeStatusMessage(result.success);
       }
     } catch (err) {
@@ -40,8 +40,9 @@ export default function Form(props) {
           sendPlaylistData(e);
         }}
         encType="multipart/form-data"
+        className="form"
       >
-        <div>
+        <div className="form-playlist">
           <label htmlFor="playlist">Type in a playlist name: </label>
           <input
             onChange={(e) =>
@@ -60,7 +61,7 @@ export default function Form(props) {
           />
         </div>
         <br />
-        <div>
+        <div className="form-image">
           <label htmlFor="image">Add an image file: </label>
           <input
             onChange={(e) => {
@@ -77,7 +78,6 @@ export default function Form(props) {
             required
             disabled={props.formDisabled}
           />
-          <input type="button" value="&#x21c4;" disabled={props.formDisabled} />
           <input
             onClick={() =>
               props.setPlaylistFormData({
@@ -91,7 +91,7 @@ export default function Form(props) {
           />
         </div>
         <br />
-        <div>
+        <div className="form-audio">
           <label htmlFor="audio">Add an audio file: </label>
           <input
             onChange={(e) =>
@@ -121,7 +121,7 @@ export default function Form(props) {
           />
         </div>
         <br />
-        <div>
+        <div className="form-song">
           <label htmlFor="song">Type in a song name: </label>
           <input
             onChange={(e) =>
@@ -140,7 +140,7 @@ export default function Form(props) {
           />
         </div>
         <br />
-        <div>
+        <div className="form-artist">
           <label htmlFor="artist">Type in an artist name: </label>
           <input
             onChange={(e) =>
@@ -159,7 +159,7 @@ export default function Form(props) {
           />
         </div>
         <br />
-        <div>
+        <div className="form-genre">
           <label htmlFor="genre">Type in a genre name: </label>
           <input
             onChange={(e) =>

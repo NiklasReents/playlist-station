@@ -6,14 +6,15 @@ export default function Playlist(props) {
   const [activeSongIndex, setActiveSongIndex] = useState(null);
   const [playlistProgress, setPlaylistProgress] = useState(null);
   const [songVolume, setSongVolume] = useState(1);
-  const lastSelectedSong = useRef("");
+  const [playButton, setPlayButton] = useState(<>&#9658;</>);
+  const lastSelectedSong = useRef(null);
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
   useEffect(resetIndexes, [props.playlistData._id]);
 
   // reset indexes (after changing playlists or closing a song)
   function resetIndexes() {
-    lastSelectedSong.current = "";
+    lastSelectedSong.current = null;
     setActiveSongIndex(null);
     setPlaylistProgress(null);
   }
@@ -26,6 +27,12 @@ export default function Playlist(props) {
       setActiveSongIndex((prevIndex) => prevIndex + 1);
       setPlaylistProgress((prevIndex) => prevIndex + 1);
     }
+  }
+
+  function handleListPlay() {
+    setPlayButton(
+      playButton.props.children === "►" ? <>&#9208;</> : <>&#9658;</>
+    );
   }
 
   // select or deselect the active song in a given playlist
@@ -61,7 +68,7 @@ export default function Playlist(props) {
       });
       const result = await response.json();
       if (result.success) {
-        props.setUploadId(crypto.randomUUID());
+        props.setActionId(crypto.randomUUID());
         props.changeStatusMessage(result.success);
       } else {
         props.changeStatusMessage(result.error);
@@ -87,35 +94,37 @@ export default function Playlist(props) {
             isActive={activeSongIndex === i}
             playlistProgress={playlistProgress}
             songVolume={songVolume}
-            setUploadId={props.setUploadId}
+            setActionId={props.setActionId}
             changeStatusMessage={props.changeStatusMessage}
-            handleSongChange={handleSongChange}
             setSongVolume={setSongVolume}
+            handleSongChange={handleSongChange}
           />
         );
       })
     ) : (
-      <li>No songs found.</li>
+      <li className="song">No songs found.</li>
     );
   }
 
   return (
-    <>
+    <section className="playlist">
       {props.playlistData && (
-        <>
-          <button onClick={deletePlaylist}>Delete Playlist</button>
-          <div>
+        <div className="playlist-info">
+          <button onClick={deletePlaylist} className="playlist-delete">
+            Delete Playlist
+          </button>
+          <div onClick={handleListPlay} className="playlist-start">
+            {playButton}
+          </div>
+          <div className="playlist-progress">
             {playlistProgress &&
               `${playlistProgress}/${props.playlistData.songs.length}`}
           </div>
-        </>
+        </div>
       )}
-      <ul
-        onClick={(e) => handleSongSelection(e)}
-        style={{ listStyleType: "none" }}
-      >
+      <ul onClick={(e) => handleSongSelection(e)} className="playlist-songs">
         {renderSongList(props.playlistData.songs)}
       </ul>
-    </>
+    </section>
   );
 }

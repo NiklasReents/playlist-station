@@ -30,7 +30,7 @@ export default function Song(props) {
       });
       const result = await response.json();
       if (result.success) {
-        props.setUploadId(crypto.randomUUID());
+        props.setActionId(crypto.randomUUID());
         props.changeStatusMessage(result.success);
       } else {
         props.changeStatusMessage(result.error);
@@ -68,7 +68,9 @@ export default function Song(props) {
         {props.song} {props.artist} {props.genre}
       </div>
       {!props.playlistProgress && (
-        <button onClick={deleteSong}>Delete Song</button>
+        <button onClick={deleteSong} className="song-delete">
+          Delete Song
+        </button>
       )}
     </li>
   );

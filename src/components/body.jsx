@@ -1,3 +1,3 @@
 export default function Body({ children }) {
-  return <main>{children}</main>;
+  return <main className="body">{children}</main>;
 }
