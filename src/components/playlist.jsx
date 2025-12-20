@@ -7,6 +7,8 @@ export default function Playlist(props) {
   const [playlistProgress, setPlaylistProgress] = useState(null);
   const [songVolume, setSongVolume] = useState(1);
   const [playButton, setPlayButton] = useState(<>&#9658;</>);
+  const playlistSongs = useRef(null);
+  const songAudioRef = useRef(null);
   const lastSelectedSong = useRef(null);
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
@@ -17,6 +19,7 @@ export default function Playlist(props) {
     lastSelectedSong.current = null;
     setActiveSongIndex(null);
     setPlaylistProgress(null);
+    setPlayButton(<>&#9658;</>);
   }
 
   // manage the transition between songs in a playlist
@@ -29,15 +32,27 @@ export default function Playlist(props) {
     }
   }
 
+  // handle playing a playlist from the play/pause button in the playlist info bar
   function handleListPlay() {
-    setPlayButton(
-      playButton.props.children === "►" ? <>&#9208;</> : <>&#9658;</>
-    );
+    if (playButton.props.children === "►") {
+      if (lastSelectedSong.current === null) {
+        lastSelectedSong.current =
+          playlistSongs.current.children[0].firstElementChild;
+        setActiveSongIndex(0);
+        setPlaylistProgress(1);
+      } else {
+        songAudioRef.current.play();
+      }
+      setPlayButton(<>&#9208;</>);
+    } else if (playButton.props.children === "⏸") {
+      songAudioRef.current.pause();
+      setPlayButton(<>&#9658;</>);
+    }
   }
 
   // select or deselect the active song in a given playlist
   function handleSongSelection(e) {
-    const list = e.currentTarget.children;
+    const list = playlistSongs.current.children;
     const selectedSong = e.target;
     for (let i = 0; i < list.length; i++) {
       if (
@@ -95,7 +110,9 @@ export default function Playlist(props) {
             playlistProgress={playlistProgress}
             songVolume={songVolume}
             setActionId={props.setActionId}
+            songAudioRef={songAudioRef}
             changeStatusMessage={props.changeStatusMessage}
+            setPlayButton={setPlayButton}
             setSongVolume={setSongVolume}
             handleSongChange={handleSongChange}
           />
@@ -122,7 +139,11 @@ export default function Playlist(props) {
           </div>
         </div>
       )}
-      <ul onClick={(e) => handleSongSelection(e)} className="playlist-songs">
+      <ul
+        onClick={(e) => handleSongSelection(e)}
+        ref={playlistSongs}
+        className="playlist-songs"
+      >
         {renderSongList(props.playlistData.songs)}
       </ul>
     </section>

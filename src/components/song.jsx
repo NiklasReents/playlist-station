@@ -2,18 +2,17 @@ import { useRef, useEffect } from "react";
 
 export default function Song(props) {
   const songRef = useRef(null);
-  const songAudioRef = useRef(null);
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
   useEffect(handleVolumeChange, [props.isActive, props.songVolume]);
 
   // keep the same song volume level across song and playlist changes
   function handleVolumeChange() {
-    if (songAudioRef.current) {
+    if (props.songAudioRef.current) {
       if (typeof props.songVolume === "number") {
-        songAudioRef.current.volume = props.songVolume;
+        props.songAudioRef.current.volume = props.songVolume;
       } else {
-        songAudioRef.current.muted = true;
+        props.songAudioRef.current.muted = true;
       }
     }
   }
@@ -50,13 +49,19 @@ export default function Song(props) {
           <div className="song-audio">
             <audio
               onLoadedData={(e) => e.currentTarget.play()}
-              onEnded={() => props.handleSongChange(songRef.current)}
+              onPlay={() => {
+                props.setPlayButton(<>&#9208;</>);
+              }}
+              onPause={() => {
+                props.setPlayButton(<>&#9658;</>);
+              }}
               onVolumeChange={(e) =>
                 props.setSongVolume(
                   !e.target.muted ? e.target.volume : e.target.muted
                 )
               }
-              ref={songAudioRef}
+              onEnded={() => props.handleSongChange(songRef.current)}
+              ref={props.songAudioRef}
               controls
             >
               <source src={serverRoot + props.audio} />
