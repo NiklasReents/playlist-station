@@ -64,7 +64,7 @@ export default function App() {
   }); // -> pass variable to MENU (information/display) and setter to the same component
   const [displayPWButton, setDisplayPWButton] = useState(false); // -> pass variable to MENU (information) and setter to the same component
   const [playlistData, setPlaylistData] = useState([]); // -> pass variable to PLAYLIST (information) and setter to HEADER
-  const [playlistMode, setPlaylistMode] = useState(list); // -> pass variable to PLAYLIST (information), FOOTER (display) and "togglePlaylistMode" function (information) and setter to the same function
+  const [playlistMode, setPlaylistMode] = useState({ name: "list", img: list }); // -> pass variable to PLAYLIST (information), FOOTER (display) and "togglePlaylistMode" function (information) and setter to the same function
   // *FOOTER*
   const [statusMessage, setStatusMessage] = useState([]); // -> pass variable to FOOTER (display) and to "changeStatusMessage" function (information) and setter to the same function
 
@@ -107,7 +107,7 @@ export default function App() {
     <Playlist
       key="playlistjsx"
       playlistData={playlistData}
-      playlistMode={playlistMode}
+      playlistMode={playlistMode.name}
       setActionId={setActionId}
       changeStatusMessage={changeStatusMessage} // preliminary; may later be passed to this compoment and SONG via Context
     />
@@ -201,12 +201,12 @@ export default function App() {
   call "changeStatusMessage" according to toggled playlist mode
   */
   function togglePlaylistMode() {
-    if (playlistMode === list) {
-      setPlaylistMode(shuffle);
-      changeStatusMessage("Playlist mode set to shuffle.");
+    if (playlistMode.name === "list") {
+      setPlaylistMode({ name: "shuffle", img: shuffle });
+      changeStatusMessage("Playlist mode set to 'shuffle'.");
     } else {
-      setPlaylistMode(list);
-      changeStatusMessage("Playlist mode set to list.");
+      setPlaylistMode({ name: "list", img: list });
+      changeStatusMessage("Playlist mode set to 'list'.");
     }
   }
 
@@ -265,7 +265,7 @@ export default function App() {
       />
       <Body>{setBody()}</Body>
       <Footer
-        playlistMode={playlistMode}
+        playlistMode={playlistMode.img}
         statusMessage={statusMessage}
         logoutUser={logoutUser}
         changeStatusMessage={changeStatusMessage}
