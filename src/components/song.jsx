@@ -1,7 +1,10 @@
-import { useRef, useEffect } from "react";
+import DeletionPopup from "./deletionPopup.jsx";
+import { useState, useRef, useEffect } from "react";
 
 export default function Song(props) {
+  const [displayDeletionPopup, setDisplayDeletionPopup] = useState(false);
   const songRef = useRef(null);
+  const songImgRef = useRef(null);
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
   useEffect(handleVolumeChange, [props.isActive, props.songVolume]);
@@ -40,43 +43,66 @@ export default function Song(props) {
   }
 
   return (
-    <li ref={songRef} className="song">
-      {props.isActive && (
-        <div className="song-data-container">
-          <div className="song-image">
-            <img src={serverRoot + props.image} alt="Image" />
+    <>
+      <li ref={songRef} className="song">
+        {props.isActive && (
+          <div className="song-data-container">
+            <div className="song-image">
+              <img
+                ref={songImgRef}
+                src={serverRoot + props.image}
+                alt="Image"
+              />
+            </div>
+            <div className="song-audio">
+              <audio
+                onLoadedData={(e) => {
+                  e.currentTarget.play();
+                  songImgRef.current.style.animation =
+                    "imageRotation 30s linear 0s infinite alternate";
+                }}
+                onPlay={() => {
+                  props.setPlayButton(<>&#9208;</>);
+                  songImgRef.current.style.animation =
+                    "imageRotation 30s linear 0s infinite alternate";
+                }}
+                onPause={() => {
+                  props.setPlayButton(<>&#9658;</>);
+                  songImgRef.current.style.animation = "";
+                }}
+                onVolumeChange={(e) =>
+                  props.setSongVolume(
+                    !e.target.muted ? e.target.volume : e.target.muted
+                  )
+                }
+                onEnded={() => props.handleSongChange(songRef.current)}
+                ref={props.songAudioRef}
+                controls
+              >
+                <source src={serverRoot + props.audio} />
+              </audio>
+            </div>
           </div>
-          <div className="song-audio">
-            <audio
-              onLoadedData={(e) => e.currentTarget.play()}
-              onPlay={() => {
-                props.setPlayButton(<>&#9208;</>);
-              }}
-              onPause={() => {
-                props.setPlayButton(<>&#9658;</>);
-              }}
-              onVolumeChange={(e) =>
-                props.setSongVolume(
-                  !e.target.muted ? e.target.volume : e.target.muted
-                )
-              }
-              onEnded={() => props.handleSongChange(songRef.current)}
-              ref={props.songAudioRef}
-              controls
-            >
-              <source src={serverRoot + props.audio} />
-            </audio>
-          </div>
+        )}
+        <div className="song-info">
+          {props.song} {props.artist} {props.genre}
         </div>
+        {!props.playlistProgress && (
+          <button
+            onClick={() => setDisplayDeletionPopup(true)}
+            className="song-delete"
+          >
+            Delete Song
+          </button>
+        )}
+      </li>
+      {displayDeletionPopup && (
+        <DeletionPopup
+          confirmationMessage={"song"}
+          deleteObject={deleteSong}
+          setDisplayDeletionPopup={setDisplayDeletionPopup}
+        />
       )}
-      <div className="song-info">
-        {props.song} {props.artist} {props.genre}
-      </div>
-      {!props.playlistProgress && (
-        <button onClick={deleteSong} className="song-delete">
-          Delete Song
-        </button>
-      )}
-    </li>
+    </>
   );
 }

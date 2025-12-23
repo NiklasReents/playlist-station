@@ -1,3 +1,4 @@
+import DeletionPopup from "./deletionPopup.jsx";
 import { useState, useRef, useEffect } from "react";
 
 import Song from "./song.jsx";
@@ -7,6 +8,7 @@ export default function Playlist(props) {
   const [playlistProgress, setPlaylistProgress] = useState(null);
   const [songVolume, setSongVolume] = useState(1);
   const [playButton, setPlayButton] = useState(<>&#9658;</>);
+  const [displayDeletionPopup, setDisplayDeletionPopup] = useState(false);
   const playlistSongs = useRef(null);
   const remainingSongs = useRef([]);
   const lastSelectedSong = useRef(null);
@@ -166,28 +168,40 @@ export default function Playlist(props) {
   }
 
   return (
-    <section className="playlist">
-      {props.playlistData && (
-        <div className="playlist-info">
-          <button onClick={deletePlaylist} className="playlist-delete">
-            Delete Playlist
-          </button>
-          <div onClick={handleListPlay} className="playlist-start">
-            {playButton}
+    <>
+      <section className="playlist">
+        {props.playlistData && (
+          <div className="playlist-info">
+            <button
+              onClick={() => setDisplayDeletionPopup(true)}
+              className="playlist-delete"
+            >
+              Delete Playlist
+            </button>
+            <div onClick={handleListPlay} className="playlist-start">
+              {playButton}
+            </div>
+            <div className="playlist-progress">
+              {playlistProgress &&
+                `${playlistProgress}/${props.playlistData.songs.length}`}
+            </div>
           </div>
-          <div className="playlist-progress">
-            {playlistProgress &&
-              `${playlistProgress}/${props.playlistData.songs.length}`}
-          </div>
-        </div>
+        )}
+        <ul
+          onClick={(e) => handleSongSelection(e)}
+          ref={playlistSongs}
+          className="playlist-songs"
+        >
+          {renderSongList(props.playlistData.songs)}
+        </ul>
+      </section>
+      {displayDeletionPopup && (
+        <DeletionPopup
+          confirmationMessage={"playlist"}
+          deleteObject={deletePlaylist}
+          setDisplayDeletionPopup={setDisplayDeletionPopup}
+        />
       )}
-      <ul
-        onClick={(e) => handleSongSelection(e)}
-        ref={playlistSongs}
-        className="playlist-songs"
-      >
-        {renderSongList(props.playlistData.songs)}
-      </ul>
-    </section>
+    </>
   );
 }
