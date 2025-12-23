@@ -58,10 +58,10 @@ export default function App() {
   const [loginData, setLoginData] = useState({ username: "", password: "" }); // -> pass variable to MENU (information/display) and setter to the same component
   // change global app settings (may be refactored later)
   const [settingsData, setSettingsData] = useState({
-    colorPrimary: "",
-    colorSecondary: "",
+    colorPrimary: "#c0c0c0",
+    colorSecondary: "#fff",
     appLanguage: "",
-  }); // -> pass variable to MENU (information/display) and setter to the same component
+  }); // -> pass variable to HEADER, FORM, MENU and FOOTER (information/display) and setter to the MENU component
   const [displayPWButton, setDisplayPWButton] = useState(false); // -> pass variable to MENU (information) and setter to the same component
   const [playlistData, setPlaylistData] = useState([]); // -> pass variable to PLAYLIST (information) and setter to HEADER
   const [playlistMode, setPlaylistMode] = useState({ name: "list", img: list }); // -> pass variable to PLAYLIST (information), FOOTER (display) and "togglePlaylistMode" function (information) and setter to the same function
@@ -79,6 +79,7 @@ export default function App() {
   // create JSX containers for use in the "setBody" function
   const formJSX = (
     <Form
+      settingsData={settingsData}
       formDisabled={formDisabled}
       playlistFormData={playlistFormData}
       setPlaylistFormData={setPlaylistFormData}
@@ -253,6 +254,7 @@ export default function App() {
   return (
     <>
       <Header
+        settingsData={settingsData}
         viewButton={viewButton}
         popupImage={popupImage}
         popupList={popupList}
@@ -265,6 +267,7 @@ export default function App() {
       />
       <Body>{setBody()}</Body>
       <Footer
+        settingsData={settingsData}
         playlistMode={playlistMode.img}
         statusMessage={statusMessage}
         logoutUser={logoutUser}

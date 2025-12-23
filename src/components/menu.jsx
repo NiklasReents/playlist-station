@@ -98,6 +98,9 @@ export default function Menu(props) {
             sendUserData(e);
           }}
           className="menu-form"
+          style={{
+            background: `radial-gradient(circle, ${props.settingsData.colorPrimary}, ${props.settingsData.colorSecondary})`,
+          }}
         >
           {props.menuContent === "Register" ? (
             <section className="menu-register">

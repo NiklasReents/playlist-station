@@ -26,7 +26,12 @@ export default function Footer(props) {
   }
 
   return (
-    <footer className="footer">
+    <footer
+      className="footer"
+      style={{
+        background: `radial-gradient(circle, ${props.settingsData.colorPrimary}, ${props.settingsData.colorSecondary})`,
+      }}
+    >
       <div className="footer-delete-user">
         {cookies.userToken && localStorage.getItem("currentUser") && (
           <button onClick={deleteUser}>Delete User</button>

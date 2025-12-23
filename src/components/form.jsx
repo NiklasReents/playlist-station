@@ -41,6 +41,9 @@ export default function Form(props) {
         }}
         encType="multipart/form-data"
         className="form"
+        style={{
+          background: `radial-gradient(circle, ${props.settingsData.colorPrimary}, ${props.settingsData.colorSecondary})`,
+        }}
       >
         <div className="form-playlist">
           <label htmlFor="playlist">Type in a playlist name: </label>

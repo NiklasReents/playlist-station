@@ -72,7 +72,12 @@ export default function Header(props) {
   }
 
   return (
-    <header className="header">
+    <header
+      className="header"
+      style={{
+        background: `radial-gradient(circle, ${props.settingsData.colorPrimary}, ${props.settingsData.colorSecondary})`,
+      }}
+    >
       <div className="header-toggleimage">
         <img onClick={props.toggleView} src={props.viewButton} alt="chevron" />
       </div>
