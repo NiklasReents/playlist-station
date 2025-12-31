@@ -8,10 +8,15 @@ export default function Playlist(props) {
   const [playlistProgress, setPlaylistProgress] = useState(null);
   const [songVolume, setSongVolume] = useState(1);
   const [playButton, setPlayButton] = useState(<>&#9658;</>);
+  const [currentFilter, setCurrentFilter] = useState({
+    filter: "all",
+    input: "",
+  });
   const [displayDeletionPopup, setDisplayDeletionPopup] = useState(false);
   const playlistSongs = useRef(null);
   const remainingSongs = useRef([]);
   const lastSelectedSong = useRef(null);
+  const filteredList = useRef([]);
   const songAudioRef = useRef(null);
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
 
@@ -34,7 +39,7 @@ export default function Playlist(props) {
   function handleSongChange(currentSong) {
     if (
       props.playlistMode === "list" &&
-      activeSongIndex < props.playlistData.songs.length - 1
+      activeSongIndex < playlistSongs.current.children.length - 1
     ) {
       lastSelectedSong.current =
         currentSong.nextElementSibling.firstElementChild;
@@ -137,10 +142,26 @@ export default function Playlist(props) {
     }
   }
 
-  // inject the fetched data into song components
-  function renderSongList(playlist) {
-    return playlist ? (
-      playlist.map((v, i) => {
+  // inject the fetched (and filtered) data into song components
+  function renderSongList() {
+    const playlist = props.playlistData.songs;
+    filteredList.current = playlist?.filter((v) => {
+      if (currentFilter.filter !== "all") {
+        return v[currentFilter.filter]
+          .toLowerCase()
+          .includes(currentFilter.input.toLowerCase());
+      } else {
+        return (
+          v["song"].toLowerCase().includes(currentFilter.input.toLowerCase()) ||
+          v["artist"]
+            .toLowerCase()
+            .includes(currentFilter.input.toLowerCase()) ||
+          v["genre"].toLowerCase().includes(currentFilter.input.toLowerCase())
+        );
+      }
+    });
+    if (filteredList.current?.length) {
+      return filteredList.current.map((v, i) => {
         return (
           <Song
             key={v._id}
@@ -161,10 +182,14 @@ export default function Playlist(props) {
             handleSongChange={handleSongChange}
           />
         );
-      })
-    ) : (
-      <li className="song">No songs found.</li>
-    );
+      });
+    } else {
+      return (
+        <li className="no-songs">
+          No {!playlist ? "songs" : "matches"} found.
+        </li>
+      );
+    }
   }
 
   return (
@@ -172,18 +197,50 @@ export default function Playlist(props) {
       <section className="playlist">
         {props.playlistData && (
           <div className="playlist-info">
-            <button
-              onClick={() => setDisplayDeletionPopup(true)}
-              className="playlist-delete"
-            >
-              Delete Playlist
-            </button>
-            <div onClick={handleListPlay} className="playlist-start">
-              {playButton}
+            <div className="playlist-delete">
+              <button onClick={() => setDisplayDeletionPopup(true)}>
+                Delete Playlist
+              </button>
             </div>
             <div className="playlist-progress">
               {playlistProgress &&
-                `${playlistProgress}/${props.playlistData.songs.length}`}
+                `${playlistProgress}/${playlistSongs.current.children.length}`}
+            </div>
+            {filteredList.current?.length ? (
+              <div onClick={handleListPlay} className="playlist-start">
+                {playButton}
+              </div>
+            ) : null}
+            <div
+              className="playlist-filter"
+              style={{ visibility: !playlistProgress ? "visible" : "hidden" }}
+            >
+              <label htmlFor="filter">Filter by...</label>
+              <select
+                onChange={(e) =>
+                  setCurrentFilter({
+                    ...currentFilter,
+                    filter: e.target.value,
+                  })
+                }
+                id="filter"
+                value={currentFilter.filter}
+              >
+                <option value="all">All</option>
+                <option value="song">Songs</option>
+                <option value="artist">Artists</option>
+                <option value="genre">Genres</option>
+              </select>
+              <input
+                onChange={(e) =>
+                  setCurrentFilter({
+                    ...currentFilter,
+                    input: e.target.value,
+                  })
+                }
+                type="text"
+                value={currentFilter.input}
+              />
             </div>
           </div>
         )}
@@ -192,7 +249,7 @@ export default function Playlist(props) {
           ref={playlistSongs}
           className="playlist-songs"
         >
-          {renderSongList(props.playlistData.songs)}
+          {renderSongList()}
         </ul>
       </section>
       {displayDeletionPopup && (

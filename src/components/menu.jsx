@@ -198,19 +198,19 @@ export default function Menu(props) {
                 />
               </div>
               <br />
-              {props.displayPWButton && (
-                <>
-                  <div>
-                    <input
-                      onClick={sendForgotPWMail}
-                      type="button"
-                      name="forgot-password"
-                      value="Forgot Password"
-                    />
-                  </div>
-                  <br />
-                </>
-              )}
+              <div
+                style={{
+                  visibility: props.displayPWButton ? "visible" : "hidden",
+                }}
+              >
+                <input
+                  onClick={sendForgotPWMail}
+                  type="button"
+                  name="forgot-password"
+                  value="Forgot Password"
+                />
+              </div>
+              <br />
             </section>
           ) : (
             <section className="menu-settings">
