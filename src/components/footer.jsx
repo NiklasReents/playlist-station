@@ -10,12 +10,10 @@ export default function Footer(props) {
   // delete the logged in user and their playlist data
   async function deleteUser() {
     try {
-      const formData = new FormData();
-      formData.set("username", localStorage.getItem("currentUser"));
       const deletionUrl = `${serverRoot}/users/delete-user`;
       const response = await fetch(deletionUrl, {
         method: "delete",
-        body: formData,
+        credentials: "include",
       });
       const result = await response.json();
       if (result.success) {
