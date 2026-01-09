@@ -48,11 +48,13 @@ export default function Footer(props) {
           <div>{props.statusMessage}</div>
         </div>
         <div className="footer-playlistmode">
-          <img
-            onClick={props.togglePlaylistMode}
-            src={props.playlistMode}
-            alt="list"
-          />
+          {cookies.userToken && localStorage.getItem("currentUser") && (
+            <img
+              onClick={props.togglePlaylistMode}
+              src={props.playlistMode}
+              alt="list"
+            />
+          )}
         </div>
       </footer>
       {displayDeletionPopup && (

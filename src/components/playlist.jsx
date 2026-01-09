@@ -16,6 +16,7 @@ export default function Playlist(props) {
   const playlistSongs = useRef(null);
   const remainingSongs = useRef([]);
   const lastSelectedSong = useRef(null);
+  const dragIndex = useRef(null);
   const filteredList = useRef([]);
   const songAudioRef = useRef(null);
   const serverRoot = import.meta.env.VITE_SERVER_ROOT;
@@ -42,7 +43,7 @@ export default function Playlist(props) {
       activeSongIndex < playlistSongs.current.children.length - 1
     ) {
       lastSelectedSong.current =
-        currentSong.nextElementSibling.firstElementChild;
+        currentSong.nextElementSibling.children[1].lastElementChild;
       setActiveSongIndex((prevIndex) => prevIndex + 1);
       setPlaylistProgress((prevIndex) => prevIndex + 1);
     } else if (
@@ -55,7 +56,7 @@ export default function Playlist(props) {
       lastSelectedSong.current =
         currentSong.parentElement.children[
           remainingSongs.current[randomIndex]
-        ].firstElementChild;
+        ].children[1].lastElementChild;
       setActiveSongIndex(remainingSongs.current[randomIndex]);
       setPlaylistProgress(remainingSongs.current[randomIndex] + 1);
       deleteCurrentIndex(remainingSongs.current[randomIndex]);
@@ -72,12 +73,14 @@ export default function Playlist(props) {
           Math.random() * remainingSongs.current.length
         );
         if (props.playlistMode === "list") {
-          lastSelectedSong.current = list[0].firstElementChild;
+          lastSelectedSong.current = list[0].children[1].lastElementChild;
           setActiveSongIndex(0);
           setPlaylistProgress(1);
         } else {
           lastSelectedSong.current =
-            list[remainingSongs.current[randomIndex]].firstElementChild;
+            list[
+              remainingSongs.current[randomIndex]
+            ].children[1].lastElementChild;
           setActiveSongIndex(remainingSongs.current[randomIndex]);
           setPlaylistProgress(remainingSongs.current[randomIndex] + 1);
           deleteCurrentIndex(remainingSongs.current[randomIndex]);
@@ -99,7 +102,7 @@ export default function Playlist(props) {
     const selectedSong = e.target;
     for (let i = 0; i < list.length; i++) {
       if (
-        selectedSong === list[i].firstElementChild &&
+        selectedSong === list[i].children[1].lastElementChild &&
         selectedSong !== lastSelectedSong.current
       ) {
         lastSelectedSong.current = selectedSong;
@@ -112,7 +115,7 @@ export default function Playlist(props) {
           deleteCurrentIndex(remainingSongs.current[i]);
         }
       } else if (
-        selectedSong === list[i].children[1] &&
+        selectedSong === list[i].children[1].lastElementChild &&
         selectedSong === lastSelectedSong.current
       ) {
         resetIndexes();
@@ -139,6 +142,38 @@ export default function Playlist(props) {
       }
     } catch (err) {
       props.changeStatusMessage(err.message);
+    }
+  }
+
+  // start dragging a song element to another one in the list
+  function handleDragStart(index) {
+    dragIndex.current = index;
+  }
+
+  // drop the dragged song element on another one for a swap
+  async function handleDrop(e, dropIndex) {
+    e.preventDefault();
+    if (dragIndex.current !== dropIndex) {
+      try {
+        const formData = new FormData();
+        formData.set("id", props.playlistData._id);
+        formData.set("dragIndex", dragIndex.current);
+        formData.set("dropIndex", dropIndex);
+        const updateUrl = `${serverRoot}/playlists/update-playlist`;
+        const response = await fetch(updateUrl, {
+          method: "put",
+          body: formData,
+        });
+        const result = await response.json();
+        if (result.success) {
+          props.setActionId(crypto.randomUUID());
+          props.changeStatusMessage(result.success);
+        } else if (result.error) {
+          props.changeStatusMessage(result.error);
+        }
+      } catch (err) {
+        props.changeStatusMessage(err.message);
+      }
     }
   }
 
@@ -177,6 +212,8 @@ export default function Playlist(props) {
             setActionId={props.setActionId}
             songAudioRef={songAudioRef}
             changeStatusMessage={props.changeStatusMessage}
+            handleDragStart={handleDragStart}
+            handleDrop={handleDrop}
             setPlayButton={setPlayButton}
             setSongVolume={setSongVolume}
             handleSongChange={handleSongChange}

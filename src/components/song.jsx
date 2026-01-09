@@ -44,57 +44,75 @@ export default function Song(props) {
 
   return (
     <>
-      <li ref={songRef} className="song">
-        {props.isActive && (
-          <div className="song-data-container">
-            <div className="song-image">
-              <img
-                ref={songImgRef}
-                src={serverRoot + props.image}
-                alt="Image"
-              />
-            </div>
-            <div className="song-audio">
-              <audio
-                onLoadedData={(e) => {
-                  e.currentTarget.play();
-                  songImgRef.current.style.animation =
-                    "imageRotation 30s linear 0s infinite alternate";
-                }}
-                onPlay={() => {
-                  props.setPlayButton(<>&#9208;</>);
-                  songImgRef.current.style.animation =
-                    "imageRotation 30s linear 0s infinite alternate";
-                }}
-                onPause={() => {
-                  props.setPlayButton(<>&#9658;</>);
-                  songImgRef.current.style.animation = "";
-                }}
-                onVolumeChange={(e) =>
-                  props.setSongVolume(
-                    !e.target.muted ? e.target.volume : e.target.muted
-                  )
-                }
-                onEnded={() => props.handleSongChange(songRef.current)}
-                ref={props.songAudioRef}
-                controls
-              >
-                <source src={serverRoot + props.audio} />
-              </audio>
-            </div>
-          </div>
-        )}
-        <div className="song-info">
-          {props.song} {props.artist} {props.genre}
-        </div>
-        {!props.playlistProgress && (
-          <button
-            onClick={() => setDisplayDeletionPopup(true)}
-            className="song-delete"
-          >
+      <li
+        onDragStart={
+          !props.isActive ? () => props.handleDragStart(props.id) : null
+        }
+        onDragOver={!props.isActive ? (e) => e.preventDefault() : null}
+        onDrop={!props.isActive ? (e) => props.handleDrop(e, props.id) : null}
+        ref={songRef}
+        draggable={!props.isActive ? true : false}
+        className="song"
+      >
+        <div
+          className="song-delete"
+          style={{ visibility: !props.isActive ? "visible" : "hidden" }}
+        >
+          <button onClick={() => setDisplayDeletionPopup(true)}>
             Delete Song
           </button>
-        )}
+        </div>
+        <div className="song-data-container">
+          {props.isActive && (
+            <div className="song-controls">
+              <div className="song-image">
+                <img
+                  ref={songImgRef}
+                  inert
+                  src={serverRoot + props.image}
+                  alt="Image"
+                />
+              </div>
+              <div className="song-audio">
+                <audio
+                  onLoadedData={(e) => {
+                    e.currentTarget.play();
+                    songImgRef.current.style.animation =
+                      "imageRotation 30s linear 0s infinite alternate";
+                  }}
+                  onPlay={() => {
+                    props.setPlayButton(<>&#9208;</>);
+                    songImgRef.current.style.animation =
+                      "imageRotation 30s linear 0s infinite alternate";
+                  }}
+                  onPause={() => {
+                    props.setPlayButton(<>&#9658;</>);
+                    songImgRef.current.style.animation = "";
+                  }}
+                  onVolumeChange={(e) =>
+                    props.setSongVolume(
+                      !e.target.muted ? e.target.volume : e.target.muted
+                    )
+                  }
+                  onEnded={() => props.handleSongChange(songRef.current)}
+                  ref={props.songAudioRef}
+                  controls
+                >
+                  <source src={serverRoot + props.audio} />
+                </audio>
+              </div>
+            </div>
+          )}
+          <div className="song-info">
+            {props.song} {props.artist} {props.genre}
+          </div>
+        </div>
+        <div
+          className="song-dnd"
+          style={{ visibility: !props.isActive ? "visible" : "hidden" }}
+        >
+          <img inert src="../src/assets/drag-and-drop.svg" />
+        </div>
       </li>
       {displayDeletionPopup && (
         <DeletionPopup

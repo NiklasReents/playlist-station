@@ -248,7 +248,13 @@ body {
   display: flex;
   flex-direction: column;
   padding: 0;
-  background: rgb(169, 169, 169);
+  background: radial-gradient(
+    circle,
+    rgb(50, 50, 50),
+    rgb(170, 170, 170),
+    rgb(192, 192, 192),
+    rgb(70, 70, 70)
+  );
 }
 
 .playlist-info {
@@ -298,7 +304,7 @@ body {
 .song,
 .no-songs {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
   margin: 5px;
   padding: 10px;
@@ -321,7 +327,17 @@ body {
   margin: 10px;
 }
 
+.song-delete > button {
+  font-size: 0.8rem;
+}
+
 .song-data-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.song-controls {
   max-height: 500px;
   max-width: 500px;
   display: flex;
@@ -339,14 +355,13 @@ body {
 
 .song-info {
   cursor: pointer;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
 }
 
 .song-info:hover {
   color: rgb(255 128 0);
-}
-
-.song-delete {
-  font-size: 0.8rem;
 }
 
 .footer {
